@@ -1,0 +1,8 @@
+flask
+joblib
+nltk
+scikit-learn
+pandas
+numpy
+pdfplumber
+python-docx

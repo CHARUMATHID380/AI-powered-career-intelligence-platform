@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CareerCast — Resume Screening Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #f2f3f0;
+    --panel: #ffffff;
+    --border: #dfe1da;
+    --border-strong: #bcc0b4;
+    --text: #1b1d19;
+    --muted: #565a50;
+    --muted-2: #888c7f;
+    --accent: #1f3a2e;
+    --accent-soft: #e9ede7;
+    --rule: #c8cbc0;
+    --skill-bg: #eef1e9;
+    --skill-text: #33513e;
+    --skill-border: #d3dbc9;
+    --error-bg: #fbeeec;
+    --error-text: #96352a;
+    --error-border: #eecac4;
+    --stamp-ready-bg: #eaf1e6;
+    --stamp-ready-text: #2f5b3f;
+    --stamp-off-bg: #f7ece2;
+    --stamp-off-text: #8a5a24;
+
+    /* categorical accent palette, used for ranked results + skill chips */
+    --c1: #2f6f4e;  --c1-bg: #e7f2ea;  --c1-border: #c9e0d0;
+    --c2: #b5772b;  --c2-bg: #faf0e1;  --c2-border: #efd9b3;
+    --c3: #3d5f95;  --c3-bg: #e8edf7;  --c3-border: #c8d5ec;
+    --c4: #8a4e8f;  --c4-bg: #f3e9f4;  --c4-border: #e2cde3;
+    --c5: #b64f3d;  --c5-bg: #f9e9e5;  --c5-border: #edccc2;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', -apple-system, sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{
+    font-family:'IBM Plex Mono', ui-monospace, monospace;
+  }
+  .top-rule{
+    height:4px;
+    background:linear-gradient(90deg, var(--c1) 0 20%, var(--c2) 20% 40%, var(--c3) 40% 60%, var(--c4) 60% 80%, var(--c5) 80% 100%);
+  }
+
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:20px 48px;
+    border-bottom:1px solid var(--border);
+    background:var(--panel);
+    flex-wrap:wrap; gap:12px;
+  }
+  .brand-block{ display:flex; align-items:baseline; gap:12px; }
+  .brand{
+    font-family:'Source Serif 4', serif;
+    font-weight:600;font-size:21px;color:var(--text);
+    letter-spacing:0.2px;
+  }
+  .brand-sub{
+    font-size:12px;color:var(--muted-2);
+    font-weight:500;
+  }
+  .doc-meta{
+    display:flex;align-items:center;gap:14px;
+    font-size:11.5px;color:var(--muted-2);
+    letter-spacing:0.3px;
+  }
+  .doc-meta .ref{ color:var(--muted); }
+  .status-pill{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:4px 10px;border-radius:3px;
+    font-size:10.5px;letter-spacing:0.6px;font-weight:600;
+    text-transform:uppercase;
+  }
+  .status-pill.ready{ background:var(--c1-bg); color:var(--c1); border:1px solid var(--c1-border); }
+  .status-pill.offline{ background:var(--c5-bg); color:var(--c5); border:1px solid var(--c5-border); }
+  .status-pill .dot{
+    width:6px;height:6px;border-radius:50%;
+    background:currentColor;
+  }
+
+  .wrap{
+    max-width:1120px;margin:0 auto;padding:44px 48px 90px;
+  }
+  .eyebrow{
+    font-size:11px;letter-spacing:1.2px;text-transform:uppercase;
+    color:var(--muted-2);font-weight:600;margin:0 0 14px;
+  }
+  .hero{ margin-bottom:36px; max-width:680px; }
+  .hero h1{
+    font-family:'Source Serif 4', serif;
+    font-size:29px;line-height:1.28;margin:0 0 12px;
+    font-weight:600;color:var(--text);
+  }
+  .hero p{
+    color:var(--muted);line-height:1.6;font-size:14.5px;margin:0;
+  }
+
+  .grid{
+    display:grid;grid-template-columns: 0.95fr 1.05fr;gap:22px;align-items:start;
+  }
+  @media (max-width: 900px){ .grid{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:26px 28px;
+  }
+  .panel-title{
+    font-size:11px;text-transform:uppercase;letter-spacing:1px;
+    color:var(--muted-2);margin:0 0 18px;font-weight:600;
+  }
+
+  .tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px;}
+  .tab-btn{
+    padding:9px 4px;margin-right:26px;
+    background:none;border:none;border-bottom:2px solid transparent;
+    color:var(--muted);font-family:'Inter',sans-serif;font-size:13.5px;font-weight:500;
+    cursor:pointer;transition:color .15s ease, border-color .15s ease;
+  }
+  .tab-btn.active{ color:var(--accent); border-bottom-color:var(--accent); }
+
+  textarea{
+    width:100%;min-height:240px;resize:vertical;
+    background:#fbfbfa;border:1px solid var(--border);
+    border-radius:3px;color:var(--text);
+    font-family:'Inter',sans-serif;font-size:13.5px;line-height:1.6;
+    padding:14px;outline:none;
+  }
+  textarea:focus{border-color:var(--accent);}
+  textarea::placeholder{color:var(--muted-2);}
+
+  .dropzone{
+    border:1.5px dashed var(--border-strong);
+    border-radius:3px;
+    padding:36px 20px;
+    text-align:center;
+    color:var(--muted);
+    cursor:pointer;
+    transition:border-color .15s ease, background .15s ease;
+    font-size:13.5px;
+  }
+  .dropzone.drag{ border-color:var(--accent); background:var(--accent-soft); }
+  .dropzone strong{color:var(--text);}
+  .dropzone .filename{
+    margin-top:10px;color:var(--skill-text);font-size:13px;font-weight:500;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  input[type=file]{display:none;}
+  .hidden{display:none !important;}
+
+  .run-btn{
+    margin-top:18px;width:100%;
+    background:var(--accent);
+    color:#fff;border:none;border-radius:3px;
+    padding:12px 20px;font-family:'Inter',sans-serif;
+    font-size:14px;font-weight:600;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:10px;
+    transition:background .15s ease;
+  }
+  .run-btn:hover{ background:#13261e; }
+  .run-btn:disabled{opacity:0.5;cursor:not-allowed;}
+
+  /* typewriter-style processing indicator, no spinner icon */
+  .processing{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;letter-spacing:0.5px;
+  }
+  .processing::after{
+    content:'';
+    display:inline-block;width:7px;height:13px;margin-left:2px;
+    background:currentColor;vertical-align:-2px;
+    animation:blink 0.9s steps(1) infinite;
+  }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  .error-box{
+    margin-top:14px;padding:11px 14px;border-radius:3px;
+    background:var(--error-bg);border:1px solid var(--error-border);
+    color:var(--error-text);font-size:13px;
+  }
+  .warn-box{
+    margin-bottom:24px;padding:12px 16px;border-radius:3px;
+    background:var(--stamp-off-bg);border:1px solid #ecd3ae;
+    color:#8a5a24;font-size:13.5px;
+  }
+
+  .empty-state{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-height:300px;color:var(--muted-2);text-align:center;gap:8px;font-size:13.5px;
+  }
+  .empty-state .mono{ font-size:11px;letter-spacing:0.8px;color:var(--muted-2); }
+
+  table.results-table{
+    width:100%;border-collapse:collapse;
+  }
+  table.results-table thead th{
+    text-align:left;font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;text-transform:uppercase;letter-spacing:0.8px;
+    color:var(--muted-2);font-weight:600;padding-bottom:10px;
+    border-bottom:1px solid var(--border);
+  }
+  table.results-table thead th.num{ text-align:right; }
+  table.results-table tbody td{
+    padding:12px 0;border-bottom:1px solid var(--border);
+    font-size:13.5px;vertical-align:middle;
+  }
+  table.results-table tbody tr:last-child td{ border-bottom:none; }
+  table.results-table td.rank{
+    color:var(--muted-2); width:28px;
+    font-family:'IBM Plex Mono', monospace; font-size:12.5px;
+  }
+  table.results-table td.job{ font-weight:600; width:34%; }
+  table.results-table td.bar-cell{ width:auto; }
+  table.results-table td.pct{
+    text-align:right;width:56px;font-weight:600;
+    font-family:'IBM Plex Mono', monospace; font-size:13px;
+  }
+  .bar-track{
+    height:6px;border-radius:2px;background:var(--accent-soft);overflow:hidden;
+  }
+  .bar-fill{
+    height:100%;border-radius:2px;width:0%;
+    background:var(--accent);
+    transition:width 600ms ease;
+  }
+  tr.rank1 td.job{ color:var(--text); }
+  tr.rank1 td.rank{ color:var(--c1); font-weight:600; }
+
+  tr.c1 .bar-fill{ background:var(--c1); } tr.c1 td.pct{ color:var(--c1); }
+  tr.c2 .bar-fill{ background:var(--c2); } tr.c2 td.pct{ color:var(--c2); }
+  tr.c3 .bar-fill{ background:var(--c3); } tr.c3 td.pct{ color:var(--c3); }
+  tr.c4 .bar-fill{ background:var(--c4); } tr.c4 td.pct{ color:var(--c4); }
+  tr.c5 .bar-fill{ background:var(--c5); } tr.c5 td.pct{ color:var(--c5); }
+
+  .section-divider{
+    margin:26px 0 16px;padding-top:22px;border-top:1px solid var(--border);
+  }
+  .section-divider h3{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;text-transform:uppercase;letter-spacing:0.8px;
+    color:var(--muted-2);margin:0 0 12px;font-weight:600;
+  }
+
+  .skills-row{ display:flex;flex-wrap:wrap;gap:8px; }
+  .skill-chip{
+    padding:5px 12px;border-radius:3px;font-size:12.5px;font-weight:500;
+    background:var(--skill-bg);color:var(--skill-text);
+    border:1px solid var(--skill-border);
+  }
+  .skill-chip.c1{ background:var(--c1-bg); color:var(--c1); border-color:var(--c1-border); }
+  .skill-chip.c2{ background:var(--c2-bg); color:var(--c2); border-color:var(--c2-border); }
+  .skill-chip.c3{ background:var(--c3-bg); color:var(--c3); border-color:var(--c3-border); }
+  .skill-chip.c4{ background:var(--c4-bg); color:var(--c4); border-color:var(--c4-border); }
+  .skill-chip.c5{ background:var(--c5-bg); color:var(--c5); border-color:var(--c5-border); }
+  .skills-empty{ color:var(--muted-2);font-size:13px; }
+
+  .preview-text{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;color:var(--muted);
+    line-height:1.7;max-height:110px;overflow:auto;white-space:pre-wrap;
+    background:#fbfbfa;border:1px solid var(--border);border-radius:3px;padding:12px;
+  }
+
+  footer{
+    color:var(--muted-2);font-size:11.5px;
+    font-family:'IBM Plex Mono', monospace;
+    padding:30px 0 10px;border-top:1px solid var(--border);margin-top:10px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="top-rule"></div>
+  <div class="topbar">
+    <div class="brand-block">
+      <div class="brand">CareerCast</div>
+      <div class="brand-sub">Resume Screening Tool</div>
+    </div>
+    <div class="doc-meta mono">
+      <span class="ref">REF. CC-2026-04</span>
+      {% if model_ready %}
+      <span class="status-pill ready"><span class="dot"></span>Model ready</span>
+      {% else %}
+      <span class="status-pill offline"><span class="dot"></span>Model offline</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="hero">
+      <p class="eyebrow mono">Resume Evaluation</p>
+      <h1>Match a resume to the right job category</h1>
+      <p>Paste resume text, or upload a PDF, Word, or plain text file. The tool identifies key skills and scores the resume against each job category using a trained classification model.</p>
+    </div>
+
+    {% if not model_ready %}
+    <div class="warn-box">
+      Model not loaded — resume_job_classifier.joblib was not found next to app.py. Train the model first, then restart the server.
+      {% if model_error %}<br>Detail: {{ model_error }}{% endif %}
+    </div>
+    {% endif %}
+
+    <div class="grid">
+      <!-- INPUT PANEL -->
+      <div class="panel">
+        <p class="panel-title mono">Resume</p>
+        <div class="tabs">
+          <button class="tab-btn active" id="tab-paste-btn" onclick="switchTab('paste')">Paste text</button>
+          <button class="tab-btn" id="tab-file-btn" onclick="switchTab('file')">Upload file</button>
+        </div>
+
+        <div id="tab-paste">
+          <textarea id="resume-textarea" placeholder="Paste the full resume text here…"></textarea>
+        </div>
+
+        <div id="tab-file" class="hidden">
+          <label class="dropzone" id="dropzone" for="file-input">
+            <div id="dropzone-default">
+              <div><strong>Click to choose a file</strong> or drag it here</div>
+              <div style="margin-top:6px;color:var(--muted-2);">PDF, DOCX, or TXT — up to 8MB</div>
+            </div>
+            <div class="filename" id="filename-display"></div>
+          </label>
+          <input type="file" id="file-input" accept=".pdf,.docx,.txt">
+        </div>
+
+        <button class="run-btn" id="run-btn" onclick="runPrediction()" {% if not model_ready %}disabled{% endif %}>
+          <span id="run-btn-label">Analyze resume</span>
+        </button>
+
+        <div id="error-box" class="error-box hidden"></div>
+      </div>
+
+      <!-- RESULTS PANEL -->
+      <div class="panel">
+        <p class="panel-title mono">Assessment</p>
+        <div id="results-empty" class="empty-state">
+          <span class="mono">— NO RECORD —</span>
+          <span>No resume analyzed yet.</span>
+        </div>
+
+        <div id="results-content" class="hidden">
+          <table class="results-table">
+            <thead>
+              <tr><th>Rank</th><th>Job category</th><th></th><th class="num">Match</th></tr>
+            </thead>
+            <tbody id="results-tbody"></tbody>
+          </table>
+
+          <div class="section-divider">
+            <h3>Skills identified</h3>
+            <div class="skills-row" id="skills-row"></div>
+          </div>
+
+          <div class="section-divider">
+            <h3>Text read from resume</h3>
+            <div class="preview-text" id="preview-text"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>Match percentages are the model's own confidence estimate, not a certified skills match.</footer>
+  </div>
+
+<script>
+let activeTab = 'paste';
+let selectedFile = null;
+
+function switchTab(tab){
+  activeTab = tab;
+  document.getElementById('tab-paste').classList.toggle('hidden', tab !== 'paste');
+  document.getElementById('tab-file').classList.toggle('hidden', tab !== 'file');
+  document.getElementById('tab-paste-btn').classList.toggle('active', tab === 'paste');
+  document.getElementById('tab-file-btn').classList.toggle('active', tab === 'file');
+}
+
+const fileInput = document.getElementById('file-input');
+const dropzone = document.getElementById('dropzone');
+
+fileInput.addEventListener('change', (e) => {
+  if (e.target.files.length){
+    selectedFile = e.target.files[0];
+    document.getElementById('filename-display').textContent = selectedFile.name;
+  }
+});
+
+['dragenter','dragover'].forEach(evt => {
+  dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.add('drag'); });
+});
+['dragleave','drop'].forEach(evt => {
+  dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.remove('drag'); });
+});
+dropzone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  const file = e.dataTransfer.files[0];
+  if (file){
+    selectedFile = file;
+    fileInput.files = e.dataTransfer.files;
+    document.getElementById('filename-display').textContent = file.name;
+  }
+});
+
+function showError(msg){
+  const box = document.getElementById('error-box');
+  box.textContent = msg;
+  box.classList.remove('hidden');
+}
+function clearError(){
+  document.getElementById('error-box').classList.add('hidden');
+}
+
+async function runPrediction(){
+  clearError();
+  const btn = document.getElementById('run-btn');
+  const label = document.getElementById('run-btn-label');
+  const formData = new FormData();
+
+  if (activeTab === 'paste'){
+    const text = document.getElementById('resume-textarea').value.trim();
+    if (!text){ showError('Paste some resume text first.'); return; }
+    formData.append('resume_text', text);
+  } else {
+    if (!selectedFile){ showError('Choose a PDF, DOCX, or TXT file first.'); return; }
+    formData.append('resume_file', selectedFile);
+  }
+
+  btn.disabled = true;
+  label.innerHTML = '<span class="processing">Analyzing</span>';
+
+  try{
+    const res = await fetch('/api/predict', { method:'POST', body: formData });
+    const data = await res.json();
+    if (!res.ok){ showError(data.error || 'Something went wrong.'); return; }
+    renderResults(data.results, data.preview, data.skills || []);
+  }catch(err){
+    showError('Could not reach the server.');
+  }finally{
+    btn.disabled = false;
+    label.textContent = 'Analyze resume';
+  }
+}
+
+function renderResults(results, preview, skills){
+  document.getElementById('results-empty').classList.add('hidden');
+  document.getElementById('results-content').classList.remove('hidden');
+
+  const tbody = document.getElementById('results-tbody');
+  tbody.innerHTML = '';
+  const palette = ['c1','c2','c3','c4','c5'];
+  results.forEach((r, i) => {
+    const row = document.createElement('tr');
+    row.className = (i === 0 ? 'rank1 ' : '') + palette[i % palette.length];
+    row.innerHTML = `
+      <td class="rank">${String(i+1).padStart(2,'0')}</td>
+      <td class="job">${r.job}</td>
+      <td class="bar-cell"><div class="bar-track"><div class="bar-fill" data-w="${r.score}"></div></div></td>
+      <td class="pct">${r.score}%</td>
+    `;
+    tbody.appendChild(row);
+  });
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.bar-fill').forEach(el => {
+      el.style.width = el.getAttribute('data-w') + '%';
+    });
+  });
+
+  const skillsRow = document.getElementById('skills-row');
+  skillsRow.innerHTML = '';
+  if (skills.length){
+    const chipPalette = ['c1','c2','c3','c4','c5'];
+    skills.forEach((s, i) => {
+      const chip = document.createElement('span');
+      chip.className = 'skill-chip ' + chipPalette[i % chipPalette.length];
+      chip.textContent = s;
+      skillsRow.appendChild(chip);
+    });
+  } else {
+    skillsRow.innerHTML = '<span class="skills-empty">No matching skills from our keyword list were found in this resume.</span>';
+  }
+
+  document.getElementById('preview-text').textContent = preview;
+}
+</script>
+</body>
+</html>
