@@ -44,12 +44,15 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # Vercel, so point NLTK there explicitly and never let a download failure
 # crash the whole module import — fall back gracefully instead.
 # ---------------------------------------------------------------------------
-NLTK_DATA_DIR = os.environ.get("NLTK_DATA", "/tmp/nltk_data")
-os.makedirs(NLTK_DATA_DIR, exist_ok=True)
+NLTK_DATA_DIR = os.path.join(BASE_DIR, "nltk_data")
 if NLTK_DATA_DIR not in nltk.data.path:
     nltk.data.path.insert(0, NLTK_DATA_DIR)
- 
+
 _nltk_ready = True
+try:
+    stopwords.words("english")  # sanity check the bundled data loads
+except Exception:  # noqa: BLE001
+    _nltk_ready = False
 try:
     nltk.download("stopwords", download_dir=NLTK_DATA_DIR, quiet=True)
     nltk.download("wordnet", download_dir=NLTK_DATA_DIR, quiet=True)
