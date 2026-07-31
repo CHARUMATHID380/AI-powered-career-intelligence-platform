@@ -43,7 +43,7 @@ PHONE_RE = re.compile(r"\+?\d[\d\-\s()]{7,}\d")
 NON_ALPHA_RE = re.compile(r"[^a-z\s]")
 MULTI_SPACE_RE = re.compile(r"\s+")
 
-MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resume_job_classifier.joblib")
+MODEL_PATH = os.path.join(BASE_DIR, "resume_job_classifier.joblib")
 TOP_N = 5
 
 SKILL_KEYWORDS = [
