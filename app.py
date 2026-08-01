@@ -1,5 +1,4 @@
 
-App · PY
 """
 CareerCast — Resume -> Suitable Job Web App
 ============================================
