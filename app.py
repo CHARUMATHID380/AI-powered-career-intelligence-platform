@@ -19,10 +19,12 @@ import io
 import os
 import re
 import string
+
  
 from flask import Flask, jsonify, render_template, request
  
 import joblib
+import narrow_model
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
@@ -200,18 +202,24 @@ def extract_text(filename: str, file_stream) -> str:
 # ---------------------------------------------------------------------------
 @app.route("/")
 def index():
-    return render_template("index.html", model_ready=_model is not None, model_error=_model_error)
- 
- 
+    return render_template(
+        "index.html",
+        model_ready=_model is not None,
+        model_error=_model_error,
+        narrow_ready=narrow_model.NARROW_READY,
+        narrow_categories=narrow_model.NARROW_CATEGORIES,
+    )
+
+
 @app.route("/api/predict", methods=["POST"])
 def predict():
     if _model is None:
         return jsonify({
             "error": "Model not loaded. Place resume_job_classifier.joblib next to app.py and restart the server."
         }), 500
- 
+
     resume_text = ""
- 
+
     # Case 1: a file was uploaded
     if "resume_file" in request.files and request.files["resume_file"].filename:
         f = request.files["resume_file"]
@@ -224,34 +232,87 @@ def predict():
             resume_text = extract_text(filename, io.BytesIO(file_bytes))
         except Exception as exc:  # noqa: BLE001
             return jsonify({"error": f"Could not read file: {exc}"}), 400
- 
+
     # Case 2: pasted text
     elif request.form.get("resume_text"):
         resume_text = request.form.get("resume_text", "")
- 
+
     else:
         return jsonify({"error": "Paste resume text or upload a PDF/DOCX/TXT file."}), 400
- 
+
     if not resume_text or not resume_text.strip():
         return jsonify({"error": "No readable text was found in the resume."}), 400
- 
+
     try:
         results = predict_top_jobs(resume_text, n=TOP_N)
     except Exception as exc:  # noqa: BLE001
         return jsonify({"error": f"Prediction failed: {exc}"}), 500
- 
+
     if not results:
         return jsonify({"error": "Resume text was too short or empty after cleaning."}), 400
- 
+
     preview = resume_text.strip().replace("\r", "")
     if len(preview) > 600:
         preview = preview[:600] + "…"
- 
+
     skills = extract_skills(resume_text)
- 
+
     return jsonify({"results": results, "preview": preview, "skills": skills})
- 
- 
+
+
+@app.route("/api/predict_narrow", methods=["POST"])
+def predict_narrow_route():
+    """
+    Separate, clearly-scoped classifier: Random Forest / XGBoost, trained on
+    a smaller hand-labeled set, recognizes only 3 categories (Java Developer,
+    Business Analyst, Project Manager). Kept as its own endpoint so its
+    results are never mixed with the broad LR model's category list.
+    """
+    if not narrow_model.NARROW_READY:
+        return jsonify({
+            "error": "Narrow classifier not loaded. Check that rf_model.joblib, xgb_model.json, "
+                     "tfidf_vectorizer.joblib, and label_encoder.joblib sit next to app.py."
+        }), 500
+
+    resume_text = ""
+
+    if "resume_file" in request.files and request.files["resume_file"].filename:
+        f = request.files["resume_file"]
+        filename = f.filename
+        ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
+        if ext not in ALLOWED_EXTENSIONS:
+            return jsonify({"error": f"Unsupported file type .{ext}. Use PDF, DOCX, or TXT."}), 400
+        try:
+            file_bytes = f.read()
+            resume_text = extract_text(filename, io.BytesIO(file_bytes))
+        except Exception as exc:  # noqa: BLE001
+            return jsonify({"error": f"Could not read file: {exc}"}), 400
+    elif request.form.get("resume_text"):
+        resume_text = request.form.get("resume_text", "")
+    else:
+        return jsonify({"error": "Paste resume text or upload a PDF/DOCX/TXT file."}), 400
+
+    if not resume_text or not resume_text.strip():
+        return jsonify({"error": "No readable text was found in the resume."}), 400
+
+    model_choice = request.form.get("model", "ensemble")  # "rf" | "xgb" | "ensemble"
+    if model_choice not in ("rf", "xgb", "ensemble"):
+        model_choice = "ensemble"
+
+    try:
+        results = narrow_model.predict_narrow(resume_text, model=model_choice, n=3)
+    except Exception as exc:  # noqa: BLE001
+        return jsonify({"error": f"Prediction failed: {exc}"}), 500
+
+    if not results:
+        return jsonify({"error": "Resume text was too short or empty after cleaning."}), 400
+
+    return jsonify({
+        "results": results,
+        "model": model_choice,
+        "categories": narrow_model.NARROW_CATEGORIES,
+    })
+
+
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
- 
