@@ -25,144 +25,128 @@ scores, along with identified skills and role-specific skill suggestions.
 
 ---
 
-## Features
+# CareerCast — Resume → Suitable Job Web App
 
-- Paste resume text directly, or upload a **PDF, DOCX, or TXT** file
-- Text extraction via `pdfplumber` (PDF) and `python-docx` (DOCX)
-- Same text-cleaning pipeline at inference time as at training time
-  (lowercasing, URL/email/phone stripping, punctuation removal, stopword
-  removal, lemmatization) so the TF-IDF vectorizer sees consistent input
-- Top 5 job category matches with confidence percentages
-  (`model.predict_proba()`)
-- Identified skills pulled from the resume, plus suggested skills for the
-  top-matched role
-- Animated circular gauge for the #1 match and ranked signal bars for the rest
+A Flask web app that predicts suitable job roles from a resume. Paste resume
+text or upload a PDF / DOCX / TXT file, and the app returns a ranked list of
+job categories with match percentages.
 
-## Tech stack
+The app ships with **two independent classifiers**, kept fully separate so
+their results are never mixed:
 
-- **Backend:** Flask, scikit-learn (Logistic Regression + TF-IDF), joblib
-- **File parsing:** pdfplumber, python-docx
-- **Frontend:** single-page HTML/CSS/JS template (no build step)
+| | Broad model | Narrow model |
+|---|---|---|
+| **Algorithm** | Logistic Regression | Random Forest + XGBoost (ensemble) |
+| **Categories** | Full label set (see `train_model.py`) | 3 categories only: Java Developer, Business Analyst, Project Manager |
+| **Endpoint** | `POST /api/predict` | `POST /api/predict_narrow` |
+| **Model file(s)** | `resume_job_classifier.joblib` | `rf_model.joblib`, `xgb_model.json`, `tfidf_vectorizer.joblib`, `label_encoder.joblib` |
+| **Loader** | `app.py` (inline) | `narrow_model.py` |
 
-## Dataset
+The narrow model was trained separately on a smaller, hand-labeled dataset
+and is intentionally kept out of the broad model's category list — the two
+never blend their predictions.
 
-The classifier is trained on the [Resume Classification Dataset](https://media.githubusercontent.com/media/noran-mohamed/Resume-Classification-Dataset/refs/heads/main/Dataset.csv)
-by [noran-mohamed](https://github.com/noran-mohamed/Resume-Classification-Dataset),
-a labeled collection of resumes across multiple job categories used to train
-the TF-IDF + Logistic Regression pipeline in `train_model.py`.
+---
 
 ## Project structure
 
 ```
 .
-├── app.py                          # Flask server: file parsing, cleaning, prediction
-├── train_model.py                  # Training pipeline -> resume_job_classifier.joblib
+├── app.py                     # Flask app: routes, text extraction, LR model loading
+├── narrow_model.py            # Loader + predictor for the RF/XGBoost narrow classifier
+├── train_model.py             # Training script for the broad LR model
+├── resume_job_classifier.joblib   # Trained broad LR model
+├── rf_model.joblib             # Trained narrow Random Forest model
+├── xgb_model.json              # Trained narrow XGBoost model (native XGBoost format)
+├── tfidf_vectorizer.joblib     # TF-IDF vectorizer for the narrow model
+├── label_encoder.joblib        # Label encoder for the narrow model's 3 categories
 ├── templates/
-│   └── index.html                  # UI
-├── screenshots/                    # Images used in this README
+│   └── index.html
+├── nltk_data/                  # Bundled NLTK data (stopwords, wordnet)
 ├── requirements.txt
-└── README.md
+└── vercel.json
 ```
 
-## Getting started (run locally)
-
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/<your-username>/AI-powered-career-intelligence-platform.git
-cd AI-powered-career-intelligence-platform
-```
-
-### 2. Create a virtual environment (recommended)
-
-```bash
-python -m venv venv
-source venv/bin/activate      # Windows: venv\Scripts\activate
-```
-
-### 3. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Get the trained model file
-
-If you already ran the notebook/script and it produced
-`resume_job_classifier.joblib`, copy that file into the project root, next
-to `app.py`.
-
-Otherwise, train it yourself (downloads the dataset, needs internet access):
-
-```bash
-python train_model.py
-```
-
-This runs a grid search over a few hyperparameter combinations and takes a
-few minutes. It ends with `resume_job_classifier.joblib` saved in the
-current folder.
-
-### 5. Run the app
-
-```bash
-python app.py
-```
-
-Open **http://localhost:5000** in your browser.
+> **Note:** the raw resume dataset used to train the narrow classifier is
+> **not included** in this repo (it contains real people's names and
+> contact details). Only the trained model artifacts are committed.
 
 ---
 
-## Deploying to Vercel
+## Run locally
 
-Vercel runs Python as serverless functions rather than a long-lived Flask
-process, so a couple of adjustments are needed on top of what works locally:
-
-1. **Add a `vercel.json`** at the project root:
-
-   ```json
-   {
-     "builds": [
-       { "src": "app.py", "use": "@vercel/python" }
-     ],
-     "routes": [
-       { "src": "/(.*)", "dest": "app.py" }
-     ]
-   }
-   ```
-
-2. **Keep `requirements.txt` at the project root** — Vercel installs from it
-   automatically for the Python build.
-
-3. **Model file size matters.** Vercel serverless functions have a deployed
-   size limit (250 MB uncompressed, including dependencies like
-   scikit-learn/pandas). If `resume_job_classifier.joblib` plus your
-   dependencies push past that, either trim dependencies, or host the model
-   file externally (e.g. a small object store) and load it at cold start,
-   or use a platform built for long-running Python apps instead
-   (Render, Railway, Fly.io, or a VM) — these avoid the serverless size/time
-   limits entirely and are usually simpler for scikit-learn apps.
-
-4. **Deploy:**
-
+1. Install dependencies:
    ```bash
-   npm install -g vercel
-   vercel login
-   vercel --prod
+   pip install -r requirements.txt
    ```
+2. Make sure these files sit next to `app.py`:
+   - `resume_job_classifier.joblib` (broad model — see `train_model.py` for training)
+   - `rf_model.joblib`, `xgb_model.json`, `tfidf_vectorizer.joblib`, `label_encoder.joblib` (narrow model)
+3. Start the server:
+   ```bash
+   python app.py
+   ```
+4. Open [http://localhost:5000](http://localhost:5000)
 
-   Or connect the GitHub repo directly in the Vercel dashboard
-   (New Project → Import Git Repository) so every push to `main` auto-deploys.
-
-5. Once deployed, update the **Live demo** link at the top of this README.
+If a model file is missing, its endpoint will return a clear JSON error
+(`model not loaded`) instead of crashing the app — the other model keeps
+working independently.
 
 ---
 
-## Notes
+## API
 
-- Max upload size is 8MB.
-- If `resume_job_classifier.joblib` isn't found next to `app.py`, the app
-  still loads but shows a banner explaining the model isn't ready, and
-  disables the "Analyze resume" button.
-- The percentages are the model's own confidence estimates
-  (`predict_proba`), not a certified skills match — they reflect how
-  similar the resume's language is to resumes in each training category.
+### `POST /api/predict` — broad model (Logistic Regression)
+
+Form data:
+- `resume_file` — PDF / DOCX / TXT upload, **or**
+- `resume_text` — pasted resume text
+
+Response:
+```json
+{
+  "results": [{"role": "...", "confidence": 0.83}, ...],
+  "preview": "...",
+  "skills": ["Python", "SQL", ...]
+}
+```
+
+### `POST /api/predict_narrow` — narrow model (Random Forest / XGBoost)
+
+Form data:
+- `resume_file` — PDF / DOCX / TXT upload, **or**
+- `resume_text` — pasted resume text
+- `model` — optional: `"rf"`, `"xgb"`, or `"ensemble"` (default: `"ensemble"`, averages both)
+
+Response:
+```json
+{
+  "results": [{"role": "Java Developer", "confidence": 0.91}, ...],
+  "model": "ensemble",
+  "categories": ["Java Developer", "Business Analyst", "Project Manager"]
+}
+```
+
+Only recognizes the 3 categories listed above — resumes for other roles
+will still return a best-effort ranking among those 3, so this endpoint is
+best used when you specifically want that narrower classification.
+
+---
+
+## Tech stack
+
+- **Backend:** Flask
+- **Models:** scikit-learn (Logistic Regression, Random Forest), XGBoost
+- **Text processing:** NLTK (stopword removal, lemmatization), regex cleaning
+- **File parsing:** PDF / DOCX / TXT resume extraction
+- **Deployment:** Vercel (see `vercel.json`)
+
+---
+
+## Notes on the narrow classifier
+
+- Trained on a smaller, hand-labeled resume set covering only 3 job titles.
+- RF and XGBoost predictions are aligned to a fixed category order before
+  ensembling, so their class indices can't silently mismatch.
+- `xgb_model.json` is loaded via XGBoost's native `load_model()` API (not
+  `joblib`), since it was saved in XGBoost's own JSON format.
