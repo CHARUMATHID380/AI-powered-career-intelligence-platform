@@ -4,4 +4,4 @@ screenshots/
 resume_labeled.csv
 __pycache__/
 *.md
-.git/
+.git/nltk_data/ 
