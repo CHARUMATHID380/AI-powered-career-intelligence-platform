@@ -1,0 +1,7 @@
+nltk_data/
+Resumes/
+screenshots/
+resume_labeled.csv
+__pycache__/
+*.md
+.git/
