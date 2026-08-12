@@ -9,3 +9,4 @@ docs/
 __pycache__/
 *.pyc
 train_model.py
+render_backend/
