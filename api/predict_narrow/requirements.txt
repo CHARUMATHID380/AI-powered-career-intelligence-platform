@@ -1,7 +1,2 @@
 flask
-joblib
-scikit-learn
-numpy
-xgboost
-pdfplumber
-python-docx
+requests
