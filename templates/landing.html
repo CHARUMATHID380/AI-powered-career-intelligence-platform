@@ -1,0 +1,373 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CareerCast — Career Intelligence Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #f2f3f0;
+    --panel: #ffffff;
+    --border: #dfe1da;
+    --border-strong: #bcc0b4;
+    --text: #1b1d19;
+    --muted: #565a50;
+    --muted-2: #888c7f;
+    --accent: #1f3a2e;
+    --accent-soft: #e9ede7;
+    --stamp: #b64f3d;
+    --stamp-bg: #f9e9e5;
+
+    --c1: #2f6f4e;  --c1-bg: #e7f2ea;  --c1-border: #c9e0d0;
+    --c2: #b5772b;  --c2-bg: #faf0e1;  --c2-border: #efd9b3;
+    --c3: #3d5f95;  --c3-bg: #e8edf7;  --c3-border: #c8d5ec;
+    --c4: #8a4e8f;  --c4-bg: #f3e9f4;  --c4-border: #e2cde3;
+    --c5: #b64f3d;  --c5-bg: #f9e9e5;  --c5-border: #edccc2;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', -apple-system, sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'IBM Plex Mono', ui-monospace, monospace;}
+  .top-rule{
+    height:4px;
+    background:linear-gradient(90deg, var(--c1) 0 20%, var(--c2) 20% 40%, var(--c3) 40% 60%, var(--c4) 60% 80%, var(--c5) 80% 100%);
+  }
+
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:20px 48px;border-bottom:1px solid var(--border);
+    background:var(--panel);flex-wrap:wrap;gap:14px;
+  }
+  .brand-block{display:flex;align-items:baseline;gap:12px;}
+  .brand{font-family:'Source Serif 4', serif;font-weight:600;font-size:21px;letter-spacing:0.2px;}
+  .brand-sub{font-size:12px;color:var(--muted-2);font-weight:500;}
+  nav{display:flex;align-items:center;gap:30px;}
+  nav a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:500;}
+  nav a:hover{color:var(--text);}
+  .btn-primary{
+    background:var(--accent);color:#fff;border:none;border-radius:3px;
+    padding:10px 18px;font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;
+    text-decoration:none;display:inline-block;transition:background .15s ease;
+  }
+  .btn-primary:hover{background:#13261e;}
+  .btn-ghost{
+    color:var(--text);border:1px solid var(--border-strong);border-radius:3px;
+    padding:9px 17px;font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;
+    text-decoration:none;display:inline-block;transition:border-color .15s ease, background .15s ease;
+  }
+  .btn-ghost:hover{border-color:var(--accent);background:var(--panel);}
+
+  .wrap{max-width:1160px;margin:0 auto;padding:0 48px;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    display:grid;grid-template-columns:1fr 0.92fr;gap:40px;align-items:center;
+    padding:72px 0 88px;
+  }
+  @media (max-width:920px){ .hero{grid-template-columns:1fr;padding:48px 0;} }
+
+  .case-stamp{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:5px 11px;border-radius:3px;
+    background:var(--stamp-bg);color:var(--stamp);
+    border:1px solid var(--c5-border);
+    font-size:11px;letter-spacing:1px;font-weight:600;text-transform:uppercase;
+    margin-bottom:20px;
+  }
+  .case-stamp .dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
+
+  .hero h1{
+    font-family:'Source Serif 4', serif;font-weight:600;
+    font-size:46px;line-height:1.16;margin:0 0 20px;letter-spacing:-0.3px;
+  }
+  .hero h1 em{font-style:italic;color:var(--accent);}
+  .hero p.lede{color:var(--muted);font-size:16px;line-height:1.65;max-width:480px;margin:0 0 30px;}
+
+  .hero-ctas{display:flex;gap:12px;margin-bottom:38px;flex-wrap:wrap;}
+
+  .hero-facts{display:flex;gap:28px;flex-wrap:wrap;}
+  .hero-fact{border-left:2px solid var(--border-strong);padding-left:12px;}
+  .hero-fact .num{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--accent);display:block;}
+  .hero-fact .label{font-size:12px;color:var(--muted-2);max-width:140px;display:block;margin-top:2px;}
+
+  /* ---------- DOSSIER VISUAL ---------- */
+  .dossier{
+    position:relative;height:420px;
+  }
+  .folder-tabs{
+    position:absolute;top:8px;right:0;display:flex;flex-direction:column;gap:8px;z-index:1;
+  }
+  .folder-tab{
+    font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:0.5px;
+    padding:7px 12px 7px 16px;border-radius:3px 0 0 3px;text-transform:uppercase;
+    box-shadow:-2px 2px 5px rgba(20,25,18,0.05);
+    transform:translateX(0);transition:transform .25s ease;
+    text-align:right;
+  }
+  .folder-tab:hover{transform:translateX(-6px);}
+  .folder-tab.t1{background:var(--c1-bg);color:var(--c1);border:1px solid var(--c1-border);border-right:none;}
+  .folder-tab.t2{background:var(--c2-bg);color:var(--c2);border:1px solid var(--c2-border);border-right:none;}
+  .folder-tab.t3{background:var(--c3-bg);color:var(--c3);border:1px solid var(--c3-border);border-right:none;}
+  .folder-tab.t4{background:var(--c4-bg);color:var(--c4);border:1px solid var(--c4-border);border-right:none;}
+  .folder-tab.t5{background:var(--c5-bg);color:var(--c5);border:1px solid var(--c5-border);border-right:none;}
+
+  .case-card{
+    position:absolute;top:36px;left:0;right:70px;bottom:0;
+    background:var(--panel);border:1px solid var(--border);border-radius:6px;
+    box-shadow:0 18px 40px -18px rgba(20,25,18,0.28);
+    padding:26px 26px 22px;overflow:hidden;
+  }
+  .case-card-head{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:16px;
+  }
+  .case-card-head .title{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-2);letter-spacing:0.6px;}
+  .case-card-head .id{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-2);}
+
+  .redact-line{height:9px;border-radius:2px;margin-bottom:9px;position:relative;overflow:hidden;background:#e4e6df;}
+  .redact-line.w1{width:92%;} .redact-line.w2{width:78%;} .redact-line.w3{width:85%;}
+  .redact-line.w4{width:60%;} .redact-line.w5{width:70%;}
+
+  .reveal-block{
+    margin-top:22px;padding-top:18px;border-top:1px dashed var(--border-strong);
+  }
+  .reveal-block .lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted-2);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:10px;}
+  .reveal-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;opacity:0;animation:revealIn .5s ease forwards;}
+  .reveal-row:nth-child(2){animation-delay:.9s;}
+  .reveal-row:nth-child(3){animation-delay:1.3s;}
+  .reveal-row:nth-child(4){animation-delay:1.7s;}
+  .reveal-row .job{font-size:13px;font-weight:600;}
+  .reveal-row .score{font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;}
+  .reveal-row.r1 .score{color:var(--c1);}
+  .reveal-row.r2 .score{color:var(--c2);}
+  .reveal-row.r3 .score{color:var(--c3);}
+
+  @keyframes revealIn{ from{opacity:0;transform:translateY(4px);} to{opacity:1;transform:translateY(0);} }
+
+  .scan-sweep{
+    position:absolute;left:0;right:0;height:56px;top:56px;
+    background:linear-gradient(180deg, transparent, rgba(31,58,46,0.10) 45%, rgba(31,58,46,0.16) 50%, rgba(31,58,46,0.10) 55%, transparent);
+    animation:scanMove 2.6s cubic-bezier(.4,0,.2,1) infinite;
+    pointer-events:none;
+  }
+  @keyframes scanMove{ 0%{top:56px;} 55%{top:300px;} 100%{top:300px;} }
+
+  @media (prefers-reduced-motion: reduce){
+    .scan-sweep{animation:none;display:none;}
+    .reveal-row{opacity:1;animation:none;}
+    .folder-tab{transition:none;}
+  }
+
+  /* ---------- HOW IT WORKS ---------- */
+  .section{padding:64px 0;border-top:1px solid var(--border);}
+  .section-head{max-width:560px;margin-bottom:44px;}
+  .eyebrow{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted-2);font-weight:600;margin:0 0 12px;}
+  .section-head h2{font-family:'Source Serif 4', serif;font-size:28px;font-weight:600;margin:0 0 10px;line-height:1.3;}
+  .section-head p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0;}
+
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  @media (max-width:820px){ .steps{grid-template-columns:1fr;} }
+  .step{
+    background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:26px 24px;position:relative;
+  }
+  .step .step-num{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted-2);
+    letter-spacing:0.6px;margin-bottom:16px;display:block;
+  }
+  .step h3{font-family:'Source Serif 4',serif;font-size:18px;font-weight:600;margin:0 0 10px;}
+  .step p{color:var(--muted);font-size:13.5px;line-height:1.6;margin:0;}
+  .step::after{
+    content:'';position:absolute;left:24px;right:24px;bottom:0;height:3px;border-radius:2px 2px 0 0;
+  }
+  .step.s1::after{background:var(--c1);} .step.s2::after{background:var(--c3);} .step.s3::after{background:var(--c5);}
+
+  /* ---------- MODELS / WITNESS CARDS ---------- */
+  .models{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+  @media (max-width:820px){ .models{grid-template-columns:1fr;} }
+  .file-card{
+    background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:28px;
+  }
+  .file-card .tag{
+    display:inline-flex;align-items:center;gap:7px;font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;letter-spacing:0.7px;text-transform:uppercase;font-weight:600;
+    padding:4px 10px;border-radius:3px;margin-bottom:16px;
+  }
+  .file-card.broad .tag{background:var(--c3-bg);color:var(--c3);border:1px solid var(--c3-border);}
+  .file-card.narrow .tag{background:var(--c2-bg);color:var(--c2);border:1px solid var(--c2-border);}
+  .file-card h3{font-family:'Source Serif 4',serif;font-size:19px;font-weight:600;margin:0 0 10px;}
+  .file-card p{color:var(--muted);font-size:13.5px;line-height:1.65;margin:0 0 16px;}
+  .file-card ul{margin:0;padding:0;list-style:none;}
+  .file-card li{
+    font-size:13px;color:var(--text);padding:8px 0;border-top:1px solid var(--border);
+    display:flex;justify-content:space-between;
+  }
+  .file-card li span{color:var(--muted-2);font-family:'IBM Plex Mono',monospace;font-size:11.5px;}
+
+  /* ---------- CTA / FOOTER ---------- */
+  .cta-band{
+    background:var(--accent);border-radius:8px;padding:48px;margin:64px 0;
+    display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
+    color:#fff;
+  }
+  .cta-band h2{font-family:'Source Serif 4',serif;font-size:26px;font-weight:600;margin:0 0 8px;}
+  .cta-band p{color:#c8d3cb;font-size:14px;margin:0;max-width:420px;}
+  .cta-band .btn-primary{background:#fff;color:var(--accent);}
+  .cta-band .btn-primary:hover{background:#eef1e9;}
+
+  footer{
+    color:var(--muted-2);font-size:11.5px;font-family:'IBM Plex Mono', monospace;
+    padding:26px 0 40px;border-top:1px solid var(--border);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  }
+</style>
+</head>
+<body>
+
+  <div class="top-rule"></div>
+  <div class="topbar">
+    <div class="brand-block">
+      <div class="brand">CareerCast</div>
+      <div class="brand-sub">Career Intelligence Platform</div>
+    </div>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="#models">The classifiers</a>
+      <a class="btn-primary" href="/tool">Open the intake desk</a>
+    </nav>
+  </div>
+
+  <div class="wrap">
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="case-stamp mono"><span class="dot"></span>Case file no. CC-2026-04</span>
+        <h1>Every résumé is a case.<br>We build the <em>file</em> in seconds.</h1>
+        <p class="lede">Submit a resume and CareerCast reads it the way an examiner would — extracting skills, cross-referencing job categories, and ranking the strongest matches with a confidence score for each.</p>
+        <div class="hero-ctas">
+          <a class="btn-primary" href="/tool">Open the intake desk</a>
+          <a class="btn-ghost" href="#how">See how it works</a>
+        </div>
+        <div class="hero-facts">
+          <div class="hero-fact">
+            <span class="num mono">02</span>
+            <span class="label">independent classifiers cross-check every résumé</span>
+          </div>
+          <div class="hero-fact">
+            <span class="num mono">8</span>
+            <span class="label">job categories tracked, 3 with specialist models</span>
+          </div>
+          <div class="hero-fact">
+            <span class="num mono">PDF · DOCX · TXT</span>
+            <span class="label">accepted formats, or paste text directly</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="dossier">
+        <div class="folder-tabs">
+          <div class="folder-tab t1">Java Developer</div>
+          <div class="folder-tab t2">Business Analyst</div>
+          <div class="folder-tab t3">Project Manager</div>
+          <div class="folder-tab t4">Data / ML</div>
+          <div class="folder-tab t5">Design</div>
+        </div>
+        <div class="case-card">
+          <div class="scan-sweep"></div>
+          <div class="case-card-head">
+            <span class="title mono">RÉSUMÉ INTAKE</span>
+            <span class="id mono">FILE #A19-402</span>
+          </div>
+          <div class="redact-line w1"></div>
+          <div class="redact-line w2"></div>
+          <div class="redact-line w3"></div>
+          <div class="redact-line w4"></div>
+          <div class="redact-line w5"></div>
+
+          <div class="reveal-block">
+            <div class="lbl">Top matches</div>
+            <div class="reveal-row r1"><span class="job">Java Developer</span><span class="score mono">99.9%</span></div>
+            <div class="reveal-row r2"><span class="job">Project Manager</span><span class="score mono">0.6%</span></div>
+            <div class="reveal-row r3"><span class="job">Business Analyst</span><span class="score mono">0.3%</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="how">
+      <div class="section-head">
+        <p class="eyebrow mono">Intake procedure</p>
+        <h2>Three steps, no manual tagging</h2>
+        <p>The same pipeline runs whether you paste raw text or drop in a file.</p>
+      </div>
+      <div class="steps">
+        <div class="step s1">
+          <span class="step-num mono">01 — Submit</span>
+          <h3>Paste or upload</h3>
+          <p>Drop in a PDF, Word doc, or plain text file — or paste the résumé text directly. Nothing is stored beyond your session.</p>
+        </div>
+        <div class="step s2">
+          <span class="step-num mono">02 — Extract</span>
+          <h3>Text &amp; skills pulled out</h3>
+          <p>The document is parsed, cleaned, and scanned against a skills vocabulary so key terms surface automatically.</p>
+        </div>
+        <div class="step s3">
+          <span class="step-num mono">03 — Match</span>
+          <h3>Ranked against every category</h3>
+          <p>The classifier scores the résumé against each job category and returns a ranked list with confidence percentages.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="models">
+      <div class="section-head">
+        <p class="eyebrow mono">On file</p>
+        <h2>Two classifiers, kept deliberately separate</h2>
+        <p>A broad reader for general screening, and a specialist panel for three high-volume roles.</p>
+      </div>
+      <div class="models">
+        <div class="file-card broad">
+          <span class="tag">General screening</span>
+          <h3>Broad classifier</h3>
+          <p>A logistic regression model trained across the full category set. This is the default reader for any résumé, regardless of role.</p>
+          <ul>
+            <li>Method <span>Logistic Regression</span></li>
+            <li>Coverage <span>8 job categories</span></li>
+            <li>Output <span>Top 5 ranked, with skills</span></li>
+          </ul>
+        </div>
+        <div class="file-card narrow">
+          <span class="tag">Specialist panel</span>
+          <h3>Narrow classifier</h3>
+          <p>A Random Forest and XGBoost ensemble trained on a hand-labeled set, focused on three roles where precision matters most.</p>
+          <ul>
+            <li>Method <span>Random Forest + XGBoost</span></li>
+            <li>Coverage <span>Java Dev · Business Analyst · PM</span></li>
+            <li>Output <span>Top 3, model-selectable</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <div class="cta-band">
+      <div>
+        <h2>Open a file on your next candidate</h2>
+        <p>No sign-up. Paste a résumé and get a ranked assessment in under a second.</p>
+      </div>
+      <a class="btn-primary" href="/tool">Open the intake desk →</a>
+    </div>
+
+    <footer>
+      <span>CareerCast — Résumé Screening Tool</span>
+      <span>Match percentages are model confidence estimates, not certified skills matches.</span>
+    </footer>
+  </div>
+
+</body>
+</html>

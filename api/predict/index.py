@@ -14,6 +14,7 @@ from text_extract import extract_text, ALLOWED_EXTENSIONS  # noqa: E402
 
 import joblib
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 BASE_DIR = os.path.join(os.path.dirname(__file__), "..", "..")
 MODEL_PATH = os.path.join(BASE_DIR, "resume_job_classifier.joblib")
@@ -21,6 +22,8 @@ MAX_CONTENT_LENGTH = 8 * 1024 * 1024  # 8 MB
 TOP_N = 5
 
 app = Flask(__name__)
+app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
+CORS(app)
 app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
 
 _model = None

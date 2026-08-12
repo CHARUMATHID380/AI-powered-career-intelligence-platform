@@ -442,7 +442,7 @@ async function runPrediction(){
   label.innerHTML = '<span class="processing">Analyzing</span>';
 
   try{
-    const res = await fetch('/api/predict', { method:'POST', body: formData });
+    const res = await fetch('http://localhost:5001/api/predict', { method:'POST', body: formData });
     const data = await res.json();
     if (!res.ok){ showError(data.error || 'Something went wrong.'); return; }
     renderResults(data.results, data.preview, data.skills || []);

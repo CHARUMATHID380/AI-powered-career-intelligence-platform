@@ -1,1 +1,4 @@
 nltk_data/ 
+__pycache__/ 
+.vercel
+.env*

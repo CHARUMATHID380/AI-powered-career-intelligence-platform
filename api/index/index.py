@@ -23,6 +23,10 @@ app = Flask(
 
 
 @app.route("/")
+def landing():
+    return render_template("landing.html")
+
+@app.route("/tool")
 def index():
     model_path = os.path.join(BASE_DIR, "resume_job_classifier.joblib")
     model_ready = os.path.exists(model_path)
@@ -33,7 +37,6 @@ def index():
         narrow_ready=narrow_is_ready(),
         narrow_categories=NARROW_CATEGORIES,
     )
-
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
