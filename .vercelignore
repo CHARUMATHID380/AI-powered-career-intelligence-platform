@@ -10,3 +10,6 @@ __pycache__/
 *.pyc
 train_model.py
 render_backend/
+**/__pycache__/
+**/*.pyc
+.vercel/python/.venv/**/__pycache__/
