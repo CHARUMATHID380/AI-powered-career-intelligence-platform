@@ -6,5 +6,4 @@ pandas
 numpy
 pdfplumber
 python-docx
-xgboost
-
+requests

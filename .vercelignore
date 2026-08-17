@@ -10,3 +10,4 @@ __pycache__/
 *.pyc
 train_model.py
 render_backend/
+fastapi_service/
