@@ -1,13 +1,1 @@
-nltk_data/
-*.pickle
-*.model
-tests/
-docs/
-*.md
-.git/nltk_data/
-.git/
-__pycache__/
-*.pyc
-train_model.py
-render_backend/
-fastapi_service/
+nltk_data/ *.pickle *.model tests/ docs/ *.md .git/nltk_data/ .git/ __pycache__/ *.pyc train_model.py render_backend/ fastapi_service/
