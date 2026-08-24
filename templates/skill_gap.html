@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CareerCast — Skill Gap Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#f2f3f0;--panel:#fff;--border:#dfe1da;--border-strong:#bcc0b4;
+    --text:#1b1d19;--muted:#565a50;--muted-2:#888c7f;
+    --accent:#1f3a2e;--accent-soft:#e9ede7;
+    --error-bg:#fbeeec;--error-text:#96352a;--error-border:#eecac4;
+    --c1:#2f6f4e;--c1-bg:#e7f2ea;--c1-border:#c9e0d0;
+    --c2:#b5772b;--c2-bg:#faf0e1;--c2-border:#efd9b3;
+    --c3:#3d5f95;--c3-bg:#e8edf7;--c3-border:#c8d5ec;
+    --c4:#8a4e8f;--c4-bg:#f3e9f4;--c4-border:#e2cde3;
+    --c5:#b64f3d;--c5-bg:#f9e9e5;--c5-border:#edccc2;
+    --skill-bg:#eef1e9;--skill-text:#33513e;--skill-border:#d3dbc9;
+    --stamp-off-bg:#f7ece2;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace;}
+  .hidden{display:none !important;}
+  .top-rule{height:4px;background:linear-gradient(90deg,var(--c1) 0 20%,var(--c2) 20% 40%,var(--c3) 40% 60%,var(--c4) 60% 80%,var(--c5) 80% 100%);}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;border-bottom:1px solid var(--border);background:var(--panel);flex-wrap:wrap;gap:12px;}
+  .brand-block{display:flex;align-items:baseline;gap:12px;}
+  .brand{font-family:'Source Serif 4',serif;font-weight:600;font-size:21px;color:var(--text);letter-spacing:0.2px;}
+  .brand-sub{font-size:12px;color:var(--muted-2);font-weight:500;}
+  nav{display:flex;align-items:center;gap:24px;}
+  nav a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:500;}
+  nav a:hover{color:var(--text);}
+  .btn-primary{background:var(--accent);color:#fff;border:none;border-radius:3px;padding:9px 16px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;text-decoration:none;display:inline-block;cursor:pointer;transition:background .15s;}
+  .btn-primary:hover{background:#13261e;}
+  .wrap{max-width:1160px;margin:0 auto;padding:40px 48px 80px;}
+  .eyebrow{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted-2);font-weight:600;margin:0 0 10px;}
+
+  /* page header */
+  .page-hero{margin-bottom:32px;max-width:680px;}
+  .page-hero h1{font-family:'Source Serif 4',serif;font-size:30px;font-weight:600;margin:0 0 12px;line-height:1.25;}
+  .page-hero p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0;}
+
+  /* input form */
+  .input-card{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:26px 28px;margin-bottom:24px;}
+  .input-card-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted-2);font-weight:600;margin:0 0 18px;}
+  .form-grid{display:grid;grid-template-columns:1fr 280px;gap:16px;align-items:start;}
+  @media(max-width:760px){.form-grid{grid-template-columns:1fr;}}
+  .form-col{display:flex;flex-direction:column;gap:8px;}
+  .form-col label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.6px;}
+  textarea.resume-input{width:100%;min-height:160px;resize:vertical;background:#fbfbfa;border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'Inter',sans-serif;font-size:13.5px;line-height:1.6;padding:12px;outline:none;}
+  textarea.resume-input:focus{border-color:var(--accent);}
+  textarea.resume-input::placeholder{color:var(--muted-2);}
+  select.job-select{padding:10px 12px;background:#fbfbfa;border:1px solid var(--border);border-radius:3px;font-family:'Inter',sans-serif;font-size:13.5px;color:var(--text);outline:none;width:100%;}
+  select.job-select:focus{border-color:var(--accent);}
+  .run-btn{margin-top:4px;width:100%;background:var(--accent);color:#fff;border:none;border-radius:3px;padding:11px 20px;font-family:'Inter',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;transition:background .15s;}
+  .run-btn:hover{background:#13261e;}
+  .run-btn:disabled{opacity:0.5;cursor:not-allowed;}
+  .or-divider{text-align:center;font-size:12px;color:var(--muted-2);padding:8px 0;}
+  .upload-label{display:block;border:1.5px dashed var(--border-strong);border-radius:3px;padding:14px;text-align:center;color:var(--muted);cursor:pointer;font-size:13px;transition:border-color .15s;}
+  .upload-label:hover{border-color:var(--accent);}
+  input[type=file]{display:none;}
+  .error-box{margin-top:12px;padding:10px 14px;border-radius:3px;background:var(--error-bg);border:1px solid var(--error-border);color:var(--error-text);font-size:13px;}
+
+  /* score overview row */
+  .score-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+  @media(max-width:760px){.score-row{grid-template-columns:1fr 1fr;}}
+  .score-card{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:18px 20px;text-align:center;}
+  .score-card .num{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;line-height:1;}
+  .score-card .lbl{font-size:11.5px;color:var(--muted-2);margin-top:5px;}
+  .score-card.highlight{border-color:var(--c1-border);background:var(--c1-bg);}
+  .score-card.highlight .num{color:var(--c1);}
+  .score-card.warn{border-color:var(--error-border);background:var(--error-bg);}
+  .score-card.warn .num{color:var(--error-text);}
+
+  /* main grid */
+  .gap-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  @media(max-width:900px){.gap-grid{grid-template-columns:1fr;}}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:22px 24px;}
+  .card.full{grid-column:1/-1;}
+  .card-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted-2);font-weight:600;margin:0 0 6px;}
+  .card-subtitle{font-family:'Source Serif 4',serif;font-size:17px;font-weight:600;margin:0 0 18px;color:var(--text);}
+
+  /* charts */
+  .chart-area{position:relative;height:260px;}
+  .chart-area-tall{position:relative;height:320px;}
+
+  /* skill pills */
+  .pill-row{display:flex;flex-wrap:wrap;gap:7px;margin-top:4px;}
+  .pill{font-family:'IBM Plex Mono',monospace;font-size:11.5px;padding:4px 10px;border-radius:3px;border:1px solid;}
+  .pill.present{background:var(--c1-bg);color:var(--c1);border-color:var(--c1-border);}
+  .pill.missing{background:var(--error-bg);color:var(--error-text);border-color:var(--error-border);}
+  .pill.rec-present{background:var(--c3-bg);color:var(--c3);border-color:var(--c3-border);}
+  .pill.rec-missing{background:var(--c2-bg);color:var(--c2);border-color:var(--c2-border);}
+
+  /* skill cluster */
+  .skill-cluster{margin-bottom:18px;}
+  .skill-cluster h4{font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted-2);font-weight:600;margin:0 0 8px;}
+
+  /* horizontal progress bars */
+  .skill-bar-list{display:flex;flex-direction:column;gap:10px;}
+  .skill-bar-item{display:flex;flex-direction:column;gap:4px;}
+  .skill-bar-head{display:flex;justify-content:space-between;font-size:12.5px;}
+  .skill-bar-head .name{font-weight:500;}
+  .skill-bar-head .status{font-family:'IBM Plex Mono',monospace;font-size:11px;}
+  .skill-bar-head .status.present{color:var(--c1);}
+  .skill-bar-head .status.missing{color:var(--error-text);}
+  .bar-track{height:6px;border-radius:3px;background:var(--accent-soft);overflow:hidden;}
+  .bar-fill{height:100%;border-radius:3px;transition:width .7s ease;}
+  .bar-fill.present{background:var(--c1);}
+  .bar-fill.missing{background:var(--error-border);}
+
+  /* suggestion list */
+  .suggestion-list{margin:0;padding:0;list-style:none;}
+  .suggestion-list li{font-size:13px;line-height:1.55;color:var(--muted);padding:8px 0 8px 18px;border-bottom:1px solid var(--border);position:relative;}
+  .suggestion-list li:last-child{border-bottom:none;}
+  .suggestion-list.add li::before{content:'+';position:absolute;left:0;color:var(--c1);font-weight:700;}
+  .suggestion-list.remove li::before{content:'−';position:absolute;left:0;color:var(--c5);font-weight:700;}
+
+  /* course list */
+  .mini-course{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);text-decoration:none;color:var(--text);}
+  .mini-course:last-child{border-bottom:none;}
+  .mini-course:hover .mc-title{color:var(--accent);text-decoration:underline;}
+  .mc-icon{width:32px;height:32px;background:var(--accent);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .mc-icon svg{width:14px;height:14px;fill:#fff;margin-left:2px;}
+  .mc-body .mc-title{font-size:13px;font-weight:500;}
+  .mc-body .mc-meta{font-size:11.5px;color:var(--muted-2);font-family:'IBM Plex Mono',monospace;margin-top:2px;}
+  .mc-skill-tag{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:3px 8px;border-radius:2px;background:var(--skill-bg);color:var(--skill-text);border:1px solid var(--skill-border);white-space:nowrap;}
+
+  /* progress ring (coverage) */
+  .coverage-ring-wrap{display:flex;align-items:center;gap:20px;}
+  .coverage-ring{width:100px;height:100px;position:relative;flex-shrink:0;}
+  .coverage-ring canvas{width:100px !important;height:100px !important;}
+  .coverage-ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .coverage-ring-label .pct{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--text);}
+  .coverage-ring-label .lbl{font-size:10px;color:var(--muted-2);text-transform:uppercase;letter-spacing:0.4px;}
+
+  /* state */
+  .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;color:var(--muted-2);text-align:center;gap:8px;font-size:13.5px;}
+  .empty-state .mono{font-size:11px;letter-spacing:0.8px;}
+  .processing{font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:0.5px;}
+  .processing::after{content:'';display:inline-block;width:7px;height:13px;margin-left:2px;background:currentColor;vertical-align:-2px;animation:blink .9s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+
+  footer{color:var(--muted-2);font-size:11.5px;font-family:'IBM Plex Mono',monospace;padding:26px 0 10px;border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+<div class="top-rule"></div>
+<div class="topbar">
+  <div class="brand-block">
+    <div class="brand">CareerCast</div>
+    <div class="brand-sub">Skill Gap Analysis</div>
+  </div>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/tool">Analyze resume</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/explore">Explore careers</a>
+    <a href="/courses">Courses</a>
+    <a class="btn-primary" href="/skill-gap">Skill gap</a>
+  </nav>
+</div>
+
+<div class="wrap">
+  <div class="page-hero">
+    <p class="eyebrow mono">Gap analysis</p>
+    <h1>See exactly what skills you're missing</h1>
+    <p>Paste your resume and choose a target job category. CareerCast maps every core and recommended skill, highlights what's missing, and shows targeted courses to close the gap — all visualized in interactive charts.</p>
+  </div>
+
+  <!-- Input -->
+  <div class="input-card">
+    <p class="input-card-title mono">Your resume + target role</p>
+    <div class="form-grid">
+      <div class="form-col">
+        <label>Resume text</label>
+        <textarea class="resume-input" id="resumeInput" placeholder="Paste your full resume here…"></textarea>
+        <div class="or-divider">— or upload a file —</div>
+        <label class="upload-label" for="fileInput">
+          <strong>Click to upload</strong> PDF, DOCX or TXT
+          <span id="fileNameDisplay" style="display:block;margin-top:4px;font-size:12px;font-family:'IBM Plex Mono',monospace;color:var(--skill-text);"></span>
+        </label>
+        <input type="file" id="fileInput" accept=".pdf,.docx,.txt">
+      </div>
+      <div class="form-col">
+        <label>Target job category</label>
+        <select class="job-select" id="jobSelect">
+          <option value="">— Select a role —</option>
+        </select>
+        <button class="run-btn" id="runBtn" onclick="runGapAnalysis()" disabled>
+          <span id="runBtnLabel">Analyze gap</span>
+        </button>
+        <div id="errorBox" class="error-box hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results (hidden until analysis runs) -->
+  <div id="resultsSection" class="hidden">
+    <!-- Score row -->
+    <div class="score-row">
+      <div class="score-card highlight">
+        <div class="num" id="scorePresentCore">—</div>
+        <div class="lbl">Core skills present</div>
+      </div>
+      <div class="score-card warn">
+        <div class="num" id="scoreMissingCore">—</div>
+        <div class="lbl">Core skills missing</div>
+      </div>
+      <div class="score-card">
+        <div class="num" id="scorePresentRec">—</div>
+        <div class="lbl">Rec. skills present</div>
+      </div>
+      <div class="score-card">
+        <div class="num" id="scoreMissingRec">—</div>
+        <div class="lbl">Rec. skills missing</div>
+      </div>
+    </div>
+
+    <!-- Charts + details grid -->
+    <div class="gap-grid">
+
+      <!-- Bar chart: skill-by-skill present/missing -->
+      <div class="card full">
+        <p class="card-title mono">Skill presence</p>
+        <p class="card-subtitle" id="barTitle">Core skills breakdown</p>
+        <div class="chart-area-tall">
+          <canvas id="skillBarChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Radar chart: coverage by quadrant -->
+      <div class="card">
+        <p class="card-title mono">Coverage radar</p>
+        <p class="card-subtitle">Core vs. recommended profile</p>
+        <div class="chart-area">
+          <canvas id="radarChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Doughnut: overall coverage -->
+      <div class="card">
+        <p class="card-title mono">Overall coverage</p>
+        <p class="card-subtitle">How complete your skill profile is</p>
+        <div class="coverage-ring-wrap" style="margin-bottom:16px;">
+          <div class="coverage-ring">
+            <canvas id="coverageChart"></canvas>
+            <div class="coverage-ring-label">
+              <span class="pct" id="coveragePct">—</span>
+              <span class="lbl">covered</span>
+            </div>
+          </div>
+          <div style="flex:1;">
+            <p style="font-size:13px;color:var(--muted);line-height:1.6;margin:0;" id="coverageSummary"></p>
+          </div>
+        </div>
+        <!-- Skills pill rows -->
+        <div class="skill-cluster">
+          <h4>Present core</h4>
+          <div class="pill-row" id="presentCorePills"></div>
+        </div>
+        <div class="skill-cluster">
+          <h4>Missing core</h4>
+          <div class="pill-row" id="missingCorePills"></div>
+        </div>
+        <div class="skill-cluster">
+          <h4>Present recommended</h4>
+          <div class="pill-row" id="presentRecPills"></div>
+        </div>
+        <div class="skill-cluster">
+          <h4>Missing recommended</h4>
+          <div class="pill-row" id="missingRecPills"></div>
+        </div>
+      </div>
+
+      <!-- Skill bar progress list -->
+      <div class="card">
+        <p class="card-title mono">Skill progress</p>
+        <p class="card-subtitle">Core skill checklist</p>
+        <div class="skill-bar-list" id="skillBarList"></div>
+      </div>
+
+      <!-- Resume suggestions -->
+      <div class="card full">
+        <p class="card-title mono">Resume suggestions</p>
+        <p class="card-subtitle">What to add and remove</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+          <div>
+            <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted-2);font-weight:600;margin:0 0 10px;">Skills to add</p>
+            <ul class="suggestion-list add" id="addList"></ul>
+          </div>
+          <div>
+            <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.6px;color:var(--muted-2);font-weight:600;margin:0 0 10px;">Phrases to remove</p>
+            <ul class="suggestion-list remove" id="removeList"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommended courses -->
+      <div class="card full">
+        <p class="card-title mono">Recommended courses</p>
+        <p class="card-subtitle" id="coursesSubtitle">Targeted tutorials for missing skills</p>
+        <div id="coursesList"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Loading overlay -->
+  <div id="loadingState" class="hidden">
+    <div class="empty-state">
+      <span class="processing mono">Analyzing skill gap</span>
+    </div>
+  </div>
+
+</div>
+<footer class="wrap" style="padding-top:16px;">Gap analysis is based on a curated skill taxonomy and may not reflect every employer's requirements.</footer>
+
+<script>
+const CATEGORIES = {{ categories | tojson }};
+let skillBarChartInst = null, radarChartInst = null, coverageChartInst = null;
+let lastResumeText = '';
+let selectedFile = null;
+
+function esc(s){ const d=document.createElement('div');d.textContent=s;return d.innerHTML; }
+
+// Populate job select
+(function init(){
+  const sel = document.getElementById('jobSelect');
+  CATEGORIES.sort().forEach(cat => {
+    const o = document.createElement('option');
+    o.value = cat; o.textContent = cat; sel.appendChild(o);
+  });
+
+  sel.addEventListener('change', () => {
+    document.getElementById('runBtn').disabled = !sel.value;
+  });
+
+  // URL param
+  const params = new URLSearchParams(window.location.search);
+  const jobParam = params.get('job');
+  if(jobParam && CATEGORIES.includes(jobParam)){
+    sel.value = jobParam;
+    document.getElementById('runBtn').disabled = false;
+  }
+
+  // File input
+  document.getElementById('fileInput').addEventListener('change', e => {
+    if(e.target.files.length){
+      selectedFile = e.target.files[0];
+      document.getElementById('fileNameDisplay').textContent = selectedFile.name;
+    }
+  });
+})();
+
+function showError(msg){ const b=document.getElementById('errorBox'); b.textContent=msg; b.classList.remove('hidden'); }
+function clearError(){ document.getElementById('errorBox').classList.add('hidden'); }
+
+async function runGapAnalysis(){
+  clearError();
+  const job = document.getElementById('jobSelect').value;
+  if(!job){ showError('Select a job category.'); return; }
+
+  // Get resume text
+  let resumeText = document.getElementById('resumeInput').value.trim();
+  if(!resumeText && selectedFile){
+    // Upload file first via predict endpoint to extract text
+    const fd = new FormData();
+    fd.append('resume_file', selectedFile);
+    try{
+      const r = await fetch('/api/predict',{method:'POST',body:fd});
+      const d = await r.json();
+      resumeText = d.full_text || d.preview || '';
+    }catch(e){ showError('Could not extract file text.'); return; }
+  }
+  if(!resumeText){ showError('Paste your resume text or upload a file.'); return; }
+
+  lastResumeText = resumeText;
+
+  document.getElementById('runBtn').disabled = true;
+  document.getElementById('runBtnLabel').innerHTML = '<span class="processing">Analyzing</span>';
+  document.getElementById('resultsSection').classList.add('hidden');
+  document.getElementById('loadingState').classList.remove('hidden');
+
+  try{
+    const res = await fetch('/api/gap_report', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({resume_text: resumeText, job_category: job})
+    });
+    const data = await res.json();
+    if(!res.ok){ throw new Error(data.error||'Server error'); }
+
+    document.getElementById('loadingState').classList.add('hidden');
+    document.getElementById('resultsSection').classList.remove('hidden');
+    renderAll(data, job);
+  }catch(e){
+    document.getElementById('loadingState').classList.add('hidden');
+    showError('Analysis failed: '+e.message);
+  }finally{
+    document.getElementById('runBtn').disabled = false;
+    document.getElementById('runBtnLabel').textContent = 'Analyze gap';
+  }
+}
+
+function renderAll(data, job){
+  const skills = data.skills || {};
+  const pc = skills.present_core || [];
+  const mc = skills.missing_core || [];
+  const pr = skills.present_recommended || [];
+  const mr = skills.missing_recommended || [];
+
+  // Score cards
+  document.getElementById('scorePresentCore').textContent = pc.length;
+  document.getElementById('scoreMissingCore').textContent = mc.length;
+  document.getElementById('scorePresentRec').textContent = pr.length;
+  document.getElementById('scoreMissingRec').textContent = mr.length;
+
+  document.getElementById('barTitle').textContent = `Core & recommended skills for ${job}`;
+
+  // 1. Horizontal bar chart: all skills present vs missing
+  renderSkillBarChart(pc, mc, pr, mr);
+
+  // 2. Radar
+  renderRadar(pc.length, mc.length, pr.length, mr.length);
+
+  // 3. Doughnut coverage
+  const total = pc.length + mc.length + pr.length + mr.length || 1;
+  const pct = Math.round((pc.length + pr.length) / total * 100);
+  renderCoverage(pc.length + pr.length, mc.length + mr.length, pct);
+
+  // 4. Pill rows
+  document.getElementById('presentCorePills').innerHTML =
+    pc.map(s=>`<span class="pill present">${esc(s)}</span>`).join('') || '<span style="font-size:13px;color:var(--muted-2)">None</span>';
+  document.getElementById('missingCorePills').innerHTML =
+    mc.map(s=>`<span class="pill missing">${esc(s)}</span>`).join('') || '<span style="font-size:13px;color:var(--muted-2)">All present!</span>';
+  document.getElementById('presentRecPills').innerHTML =
+    pr.map(s=>`<span class="pill rec-present">${esc(s)}</span>`).join('') || '<span style="font-size:13px;color:var(--muted-2)">None</span>';
+  document.getElementById('missingRecPills').innerHTML =
+    mr.map(s=>`<span class="pill rec-missing">${esc(s)}</span>`).join('') || '<span style="font-size:13px;color:var(--muted-2)">All present!</span>';
+
+  // 5. Skill bar progress list
+  renderSkillBars(pc, mc);
+
+  // 6. Suggestions
+  const sugg = data.resume_suggestions || {};
+  document.getElementById('addList').innerHTML =
+    (sugg.add||[]).map(s=>`<li>${esc(s)}</li>`).join('') || '<li style="color:var(--muted-2)">No additions needed.</li>';
+  document.getElementById('removeList').innerHTML =
+    (sugg.remove||[]).map(s=>`<li>${esc(s)}</li>`).join('') || '<li style="color:var(--muted-2)">No removals suggested.</li>';
+
+  // 7. Courses
+  renderCourses(data.courses||[], job);
+
+  // Scroll to results
+  document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function renderSkillBarChart(pc, mc, pr, mr){
+  if(skillBarChartInst) skillBarChartInst.destroy();
+
+  const allCore = [...pc.map(s=>({s,type:'core',present:true})), ...mc.map(s=>({s,type:'core',present:false}))];
+  const allRec  = [...pr.map(s=>({s,type:'rec',present:true})), ...mr.map(s=>({s,type:'rec',present:false}))];
+  const all = [...allCore, ...allRec];
+
+  const ctx = document.getElementById('skillBarChart').getContext('2d');
+  skillBarChartInst = new Chart(ctx, {
+    type: 'bar',
+    data:{
+      labels: all.map(i=>i.s),
+      datasets:[{
+        label:'Present',
+        data: all.map(i=> i.present ? 1 : 0),
+        backgroundColor: all.map(i=> i.present ? (i.type==='core'?'rgba(47,111,78,0.8)':'rgba(61,95,149,0.7)') : 'rgba(182,79,61,0.25)'),
+        borderColor: all.map(i=> i.present ? (i.type==='core'?'#2f6f4e':'#3d5f95') : '#edccc2'),
+        borderWidth: 1,
+        borderRadius: 3,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label: c => c.parsed.x===1 ? ' Present' : ' Missing'}}
+      },
+      scales:{
+        x:{display:false,max:1},
+        y:{grid:{display:false},ticks:{font:{family:"'IBM Plex Mono'",size:11}}}
+      }
+    }
+  });
+}
+
+function renderRadar(pc,mc,pr,mr){
+  if(radarChartInst) radarChartInst.destroy();
+  const ctx = document.getElementById('radarChart').getContext('2d');
+  radarChartInst = new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:['Core present','Core missing','Rec. present','Rec. missing'],
+      datasets:[{
+        label:'Skills',data:[pc,mc,pr,mr],
+        backgroundColor:'rgba(47,111,78,0.15)',borderColor:'#2f6f4e',
+        pointBackgroundColor:'#2f6f4e',pointBorderColor:'#fff',
+        borderWidth:2,pointRadius:5,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{r:{beginAtZero:true,ticks:{stepSize:1,font:{family:"'IBM Plex Mono'",size:10}},
+        grid:{color:'rgba(0,0,0,0.07)'},pointLabels:{font:{family:"'Inter'",size:11}}}}
+    }
+  });
+}
+
+function renderCoverage(present, missing, pct){
+  if(coverageChartInst) coverageChartInst.destroy();
+  const ctx = document.getElementById('coverageChart').getContext('2d');
+  coverageChartInst = new Chart(ctx,{
+    type:'doughnut',
+    data:{
+      labels:['Present','Missing'],
+      datasets:[{data:[present,missing],backgroundColor:['#2f6f4e','#edccc2'],borderWidth:0}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false}}}
+  });
+  document.getElementById('coveragePct').textContent = pct+'%';
+  document.getElementById('coverageSummary').textContent =
+    pct >= 80 ? `Strong profile — you cover ${pct}% of expected skills for this role.`
+    : pct >= 50 ? `Moderate profile — ${pct}% skill coverage. Focus on the missing core skills to improve your fit.`
+    : `Significant gap — only ${pct}% skill coverage. Consider the recommended courses below to bridge the gap.`;
+}
+
+function renderSkillBars(present, missing){
+  const all = [...present.map(s=>({s,has:true})),...missing.map(s=>({s,has:false}))];
+  document.getElementById('skillBarList').innerHTML = all.map(item=>`
+    <div class="skill-bar-item">
+      <div class="skill-bar-head">
+        <span class="name">${esc(item.s)}</span>
+        <span class="status ${item.has?'present':'missing'}">${item.has?'✓ present':'✗ missing'}</span>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill ${item.has?'present':'missing'}" style="width:${item.has?'100':'15'}%;"></div>
+      </div>
+    </div>`).join('');
+}
+
+function renderCourses(courses, job){
+  document.getElementById('coursesSubtitle').textContent = `Courses to bridge your gap for ${job}`;
+  const el = document.getElementById('coursesList');
+  if(!courses.length){el.innerHTML='<p style="color:var(--muted-2);font-size:13px;">No course data available.</p>';return;}
+
+  el.innerHTML = courses.map(group=>{
+    const results = group.results||[];
+    if(!results.length) return '';
+    if(results[0]?.error) return '';
+    return results.slice(0,2).map(c=>`
+      <a class="mini-course" href="${esc(c.url||'#')}" target="_blank" rel="noopener noreferrer">
+        <div class="mc-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="mc-body">
+          <div class="mc-title">${esc(c.title||'Untitled')}</div>
+          <div class="mc-meta">${esc(c.channel||'')} · YouTube</div>
+        </div>
+        <span class="mc-skill-tag">${esc(group.skill)}</span>
+      </a>`).join('');
+  }).join('');
+}
+</script>
+</body>
+</html>

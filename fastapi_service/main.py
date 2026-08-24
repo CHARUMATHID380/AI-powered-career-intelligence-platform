@@ -17,10 +17,8 @@ assumptions about your existing code that you'll need to confirm/adjust:
      resume_job_classifier.joblib is a scikit-learn Pipeline exposing
      .predict_proba() and .classes_. Adjust if your actual model is
      structured differently (e.g. separate vectorizer + classifier files).
-  2. Skill extraction (`extract_skills`) is a SIMPLE FALLBACK — it just
-     keyword-matches against the skill_gap taxonomy. Swap this out for
-     your real, more sophisticated skill-extraction logic if you have one
-     already built elsewhere in the project.
+  2. Skill extraction uses your existing extract_skills() from
+     lib/clean_text.py (regex keyword-matching against SKILL_KEYWORDS).
   3. Text cleaning/extraction reuses your existing lib/clean_text.py and
      lib/text_extract.py via the same sys.path pattern your other
      functions already use.
@@ -34,17 +32,41 @@ import sys
 
 import joblib
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 # --- Reuse existing shared modules (same pattern as api/predict_narrow) ---
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "lib"))
-from clean_text import clean_text  # noqa: E402
+from clean_text import clean_resume_text, extract_skills as extract_skills_real  # noqa: E402
 from text_extract import extract_text, ALLOWED_EXTENSIONS  # noqa: E402
 
 sys.path.insert(0, os.path.dirname(__file__))
 from skill_gap import JOB_SKILLS, generate_gap_report, add_course_suggestions, GapReport  # noqa: E402
 
 app = FastAPI(title="CareerCast Skill Gap & Prediction API", version="0.1.0")
+
+# ---------------------------------------------------------------------------
+# CORS
+# ---------------------------------------------------------------------------
+# Frontend (index.html, served via Flask on Vercel) calls this service
+# directly from the browser, so it needs an explicit allow-list rather than
+# "*" once you're in production. Set ALLOWED_ORIGINS as a comma-separated
+# env var on Render, e.g.:
+#   ALLOWED_ORIGINS=https://your-vercel-app.vercel.app,http://localhost:5001
+_default_origins = "http://localhost:5000,http://localhost:5001,http://127.0.0.1:5000,http://127.0.0.1:5001"
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("ALLOWED_ORIGINS", _default_origins).split(",")
+    if origin.strip()
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=False,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type"],
+)
 
 # ---------------------------------------------------------------------------
 # MODEL LOADING (broad classifier)
@@ -83,31 +105,12 @@ def predict_top5(resume_text: str) -> list[dict]:
             detail=f"Broad classifier not loaded: {_broad_model_error}",
         )
 
-    cleaned = clean_text(resume_text)
+    cleaned = clean_resume_text(resume_text)
     probs = _broad_model.predict_proba([cleaned])[0]
     classes = _broad_model.classes_
 
     ranked = sorted(zip(classes, probs), key=lambda x: x[1], reverse=True)[:5]
     return [{"job_category": str(c), "confidence": round(float(p), 4)} for c, p in ranked]
-
-
-# ---------------------------------------------------------------------------
-# SKILL EXTRACTION (simple fallback — replace with your real extractor)
-# ---------------------------------------------------------------------------
-def extract_skills(resume_text: str) -> list[str]:
-    """
-    FALLBACK ONLY. Keyword-matches the resume text against every skill
-    that appears anywhere in JOB_SKILLS. Replace this with your project's
-    existing, more sophisticated skill-extraction logic if one exists —
-    this is here so the endpoints are fully functional out of the box.
-    """
-    lowered = resume_text.lower()
-    all_skills = set()
-    for taxonomy in JOB_SKILLS.values():
-        all_skills.update(taxonomy["core"])
-        all_skills.update(taxonomy["recommended"])
-
-    return [skill for skill in all_skills if skill in lowered]
 
 
 # ---------------------------------------------------------------------------
@@ -175,7 +178,7 @@ async def gap_report(payload: GapReportRequest):
     if payload.job_category not in JOB_SKILLS:
         raise HTTPException(400, f"Unknown job category. Known: {list(JOB_SKILLS)}")
 
-    skills = extract_skills(payload.resume_text)
+    skills = extract_skills_real(payload.resume_text)
     result = generate_gap_report(payload.resume_text, skills, payload.job_category)
     result["extracted_skills"] = skills  # useful for debugging/UI display
     return result

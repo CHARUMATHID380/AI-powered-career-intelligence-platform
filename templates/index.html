@@ -279,6 +279,95 @@
     font-family:'IBM Plex Mono', monospace;
     padding:30px 0 10px;border-top:1px solid var(--border);margin-top:10px;
   }
+
+  /* --- Gap report integration --- */
+  table.results-table tbody tr.clickable{ cursor:pointer; transition:background .12s ease; }
+  table.results-table tbody tr.clickable:hover{ background:var(--accent-soft); }
+  table.results-table tbody tr.row-active{ background:var(--accent-soft); }
+  table.results-table tbody tr.row-active td.job{ color:var(--accent); }
+  .row-hint{
+    font-size:10.5px;color:var(--muted-2);margin:6px 0 0;
+    font-family:'IBM Plex Mono', monospace;letter-spacing:0.3px;
+  }
+
+  .gap-panel{
+    margin-top:22px;padding-top:20px;border-top:1px solid var(--border);
+  }
+  .gap-panel-title{
+    font-size:11px;text-transform:uppercase;letter-spacing:1px;
+    color:var(--muted-2);font-weight:600;margin:0 0 4px;
+  }
+  .gap-panel-job{
+    font-family:'Source Serif 4', serif;font-size:17px;font-weight:600;
+    color:var(--text);margin:0 0 16px;
+  }
+
+  .gap-loading{
+    display:flex;align-items:center;gap:8px;
+    color:var(--muted);font-size:13px;padding:14px 0;
+  }
+
+  .gap-note{
+    padding:10px 14px;border-radius:3px;font-size:12.5px;
+    background:var(--stamp-off-bg);border:1px solid #ecd3ae;color:#8a5a24;
+    margin-bottom:14px;
+  }
+
+  .skill-cluster{ margin-bottom:16px; }
+  .skill-cluster h4{
+    font-size:11px;text-transform:uppercase;letter-spacing:0.6px;
+    color:var(--muted-2);font-weight:600;margin:0 0 8px;
+  }
+  .pill-row{ display:flex;flex-wrap:wrap;gap:7px; }
+  .pill{
+    font-family:'IBM Plex Mono', monospace;font-size:11.5px;
+    padding:4px 9px;border-radius:3px;border:1px solid;
+  }
+  .pill.present{ background:var(--c1-bg); color:var(--c1); border-color:var(--c1-border); }
+  .pill.missing{ background:var(--error-bg); color:var(--error-text); border-color:var(--error-border); }
+
+  .suggestion-list{ margin:0;padding:0;list-style:none; }
+  .suggestion-list li{
+    font-size:13px;line-height:1.55;color:var(--muted);
+    padding:8px 0 8px 16px;border-bottom:1px solid var(--border);
+    position:relative;
+  }
+  .suggestion-list li:last-child{ border-bottom:none; }
+  .suggestion-list.add li::before{ content:'+';position:absolute;left:0;color:var(--c1);font-weight:700; }
+  .suggestion-list.remove li::before{ content:'\2212';position:absolute;left:0;color:var(--c5);font-weight:700; }
+
+  .course-group{ margin-bottom:12px; }
+  .course-group .skill-label{
+    font-family:'IBM Plex Mono', monospace;font-size:11px;
+    color:var(--muted-2);text-transform:uppercase;letter-spacing:0.5px;
+    margin-bottom:6px;display:block;
+  }
+  .course-card{
+    display:block;padding:9px 12px;margin-bottom:6px;
+    border:1px solid var(--border);border-radius:3px;
+    text-decoration:none;color:var(--text);font-size:13px;
+    transition:border-color .12s ease;
+  }
+  .course-card:hover{ border-color:var(--border-strong); }
+  .course-card .course-channel{
+    display:block;font-size:11.5px;color:var(--muted-2);margin-top:2px;
+  }
+  .course-card.unavailable{
+    color:var(--muted-2);font-style:italic;cursor:default;
+  }
+
+  .gap-error{
+    padding:11px 14px;border-radius:3px;
+    background:var(--error-bg);border:1px solid var(--error-border);
+    color:var(--error-text);font-size:13px;display:flex;
+    align-items:center;justify-content:space-between;gap:12px;
+  }
+  .gap-error button{
+    background:none;border:1px solid var(--error-border);color:var(--error-text);
+    border-radius:3px;padding:5px 10px;font-size:12px;cursor:pointer;
+    font-family:'Inter',sans-serif;white-space:nowrap;
+  }
+  .gap-error button:hover{ background:var(--error-border); }
 </style>
 </head>
 <body>
@@ -359,6 +448,9 @@
             </thead>
             <tbody id="results-tbody"></tbody>
           </table>
+          <p class="row-hint">Click a row to see the skill gap report for that role.</p>
+
+          <div id="gap-panel" class="gap-panel hidden"></div>
 
           <div class="section-divider">
             <h3>Skills identified</h3>
@@ -379,6 +471,18 @@
 <script>
 let activeTab = 'paste';
 let selectedFile = null;
+
+// TODO: replace with your deployed Render URL once live, e.g.
+// const FASTAPI_BASE_URL = 'https://careercast-gap-service.onrender.com';
+const FASTAPI_BASE_URL = 'http://127.0.0.1:8000';
+
+// Resume text captured from the last successful /predict call, used for
+// gap-report requests when a job row is clicked. `resumeTextTruncated` is
+// true when we only have Flask's preview snippet (file-upload case) rather
+// than the full extracted text — see note in runPrediction().
+let lastResumeText = '';
+let resumeTextTruncated = false;
+let activeGapJob = null;
 
 function switchTab(tab){
   activeTab = tab;
@@ -442,9 +546,27 @@ async function runPrediction(){
   label.innerHTML = '<span class="processing">Analyzing</span>';
 
   try{
-    const res = await fetch('http://localhost:5001/api/predict', { method:'POST', body: formData });
+    const res = await fetch('/api/predict', { method:'POST', body: formData });
     const data = await res.json();
     if (!res.ok){ showError(data.error || 'Something went wrong.'); return; }
+
+    // Capture resume text for later gap-report calls. If we pasted text,
+    // we already have the full thing. If we uploaded a file, prefer
+    // data.full_text if Flask sends it back; otherwise fall back to the
+    // (likely truncated) preview and flag it so the gap panel can warn.
+    if (activeTab === 'paste'){
+      lastResumeText = document.getElementById('resume-textarea').value.trim();
+      resumeTextTruncated = false;
+    } else {
+      lastResumeText = data.full_text || data.preview || '';
+      resumeTextTruncated = !data.full_text;
+    }
+
+    // reset any previously shown gap report — it belonged to the last analysis
+    activeGapJob = null;
+    document.getElementById('gap-panel').classList.add('hidden');
+    document.getElementById('gap-panel').innerHTML = '';
+
     renderResults(data.results, data.preview, data.skills || []);
   }catch(err){
     showError('Could not reach the server.');
@@ -463,13 +585,15 @@ function renderResults(results, preview, skills){
   const palette = ['c1','c2','c3','c4','c5'];
   results.forEach((r, i) => {
     const row = document.createElement('tr');
-    row.className = (i === 0 ? 'rank1 ' : '') + palette[i % palette.length];
+    row.className = (i === 0 ? 'rank1 ' : '') + palette[i % palette.length] + ' clickable';
+    row.dataset.job = r.job;
     row.innerHTML = `
       <td class="rank">${String(i+1).padStart(2,'0')}</td>
       <td class="job">${r.job}</td>
       <td class="bar-cell"><div class="bar-track"><div class="bar-fill" data-w="${r.score}"></div></div></td>
       <td class="pct">${r.score}%</td>
     `;
+    row.addEventListener('click', () => loadGapReport(r.job, row));
     tbody.appendChild(row);
   });
   requestAnimationFrame(() => {
@@ -493,6 +617,153 @@ function renderResults(results, preview, skills){
   }
 
   document.getElementById('preview-text').textContent = preview;
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function setActiveRow(row){
+  document.querySelectorAll('#results-tbody tr').forEach(tr => tr.classList.remove('row-active'));
+  if (row) row.classList.add('row-active');
+}
+
+async function loadGapReport(jobCategory, row){
+  const panel = document.getElementById('gap-panel');
+
+  if (!lastResumeText){
+    panel.classList.remove('hidden');
+    panel.innerHTML = `<div class="gap-error"><span>No resume text available for gap analysis. Try re-running the analysis.</span></div>`;
+    return;
+  }
+
+  activeGapJob = jobCategory;
+  setActiveRow(row);
+  panel.classList.remove('hidden');
+  panel.innerHTML = `
+    <p class="gap-panel-title mono">Skill gap report</p>
+    <p class="gap-panel-job">${escapeHtml(jobCategory)}</p>
+    <div class="gap-loading"><span class="processing">Fetching gap analysis</span></div>
+  `;
+
+  try{
+    const res = await fetch(`${FASTAPI_BASE_URL}/gap-report`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resume_text: lastResumeText, job_category: jobCategory })
+    });
+
+    // Job category unknown to the gap-analysis taxonomy — degrade gracefully
+    // rather than showing a raw error, since Flask's classifier categories
+    // aren't guaranteed to match FastAPI's skill taxonomy.
+    if (res.status === 400){
+      if (activeGapJob !== jobCategory) return; // a newer click superseded this one
+      panel.innerHTML = `
+        <p class="gap-panel-title mono">Skill gap report</p>
+        <p class="gap-panel-job">${escapeHtml(jobCategory)}</p>
+        <div class="gap-error"><span>A detailed skill gap report isn't available for "${escapeHtml(jobCategory)}" yet.</span></div>
+      `;
+      return;
+    }
+
+    if (!res.ok){
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.detail || `Server responded with ${res.status}`);
+    }
+
+    const data = await res.json();
+    if (activeGapJob !== jobCategory) return; // stale response, a different row was clicked meanwhile
+    renderGapReport(jobCategory, data);
+  }catch(err){
+    if (activeGapJob !== jobCategory) return;
+    panel.innerHTML = `
+      <p class="gap-panel-title mono">Skill gap report</p>
+      <p class="gap-panel-job">${escapeHtml(jobCategory)}</p>
+      <div class="gap-error">
+        <span>Could not reach the gap analysis service. It may be waking up from idle (can take up to 30s on first request) — try again in a moment.</span>
+        <button onclick="loadGapReport('${jobCategory.replace(/'/g, "\\'")}', document.querySelector('#results-tbody tr.row-active'))">Retry</button>
+      </div>
+    `;
+  }
+}
+
+function renderGapReport(jobCategory, data){
+  const panel = document.getElementById('gap-panel');
+  const skills = data.skills || {};
+  const suggestions = data.resume_suggestions || {};
+  const courses = data.courses || [];
+
+  let truncatedNote = '';
+  if (resumeTextTruncated){
+    truncatedNote = `<div class="gap-note">This gap report is based on a text preview, not the full resume, since only a snippet was available for the uploaded file. Results may be incomplete.</div>`;
+  }
+
+  const presentCore = (skills.present_core || []).map(s => `<span class="pill present">${escapeHtml(s)}</span>`).join('');
+  const missingCore = (skills.missing_core || []).map(s => `<span class="pill missing">${escapeHtml(s)}</span>`).join('');
+  const presentRec = (skills.present_recommended || []).map(s => `<span class="pill present">${escapeHtml(s)}</span>`).join('');
+  const missingRec = (skills.missing_recommended || []).map(s => `<span class="pill missing">${escapeHtml(s)}</span>`).join('');
+
+  const addList = (suggestions.add || []).map(s => `<li>${escapeHtml(s)}</li>`).join('');
+  const removeList = (suggestions.remove || []).map(s => `<li>${escapeHtml(s)}</li>`).join('');
+
+  const courseGroups = courses.map(group => {
+    const results = group.results || [];
+    let items;
+    if (!results.length){
+      items = `<span class="course-card unavailable">No courses found for this skill.</span>`;
+    } else if (results[0] && results[0].error){
+      items = `<span class="course-card unavailable">${escapeHtml(results[0].error)}</span>`;
+    } else {
+      items = results.map(c => `
+        <a class="course-card" href="${escapeHtml(c.url || '#')}" target="_blank" rel="noopener noreferrer">
+          ${escapeHtml(c.title || 'Untitled')}
+          <span class="course-channel">${escapeHtml(c.channel || '')}</span>
+        </a>
+      `).join('');
+    }
+    return `
+      <div class="course-group">
+        <span class="skill-label mono">${escapeHtml(group.skill)}</span>
+        ${items}
+      </div>
+    `;
+  }).join('');
+
+  panel.innerHTML = `
+    <p class="gap-panel-title mono">Skill gap report</p>
+    <p class="gap-panel-job">${escapeHtml(jobCategory)}</p>
+    ${truncatedNote}
+
+    <div class="skill-cluster">
+      <h4>Core skills</h4>
+      <div class="pill-row">${presentCore}${missingCore || '<span class="skills-empty">All core skills present.</span>'}</div>
+    </div>
+    ${(presentRec || missingRec) ? `
+    <div class="skill-cluster">
+      <h4>Recommended skills</h4>
+      <div class="pill-row">${presentRec}${missingRec}</div>
+    </div>` : ''}
+
+    ${addList ? `
+    <div class="skill-cluster">
+      <h4>Suggested additions</h4>
+      <ul class="suggestion-list add">${addList}</ul>
+    </div>` : ''}
+
+    ${removeList ? `
+    <div class="skill-cluster">
+      <h4>Suggested removals</h4>
+      <ul class="suggestion-list remove">${removeList}</ul>
+    </div>` : ''}
+
+    ${courseGroups ? `
+    <div class="skill-cluster">
+      <h4>Recommended courses</h4>
+      ${courseGroups}
+    </div>` : ''}
+  `;
 }
 </script>
 </body>

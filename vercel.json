@@ -1,8 +1,3 @@
-{
-  "framework": null,
-  "rewrites": [
-    { "source": "/", "destination": "/api/index" },
-    { "source": "/api/predict", "destination": "/api/predict" },
-    { "source": "/api/predict_narrow", "destination": "/api/predict_narrow" }
-  ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:ec8a45ffaec3bad58e56dc9638047af6e57d002aaca015be56ef113e541e1f31
+size 1133

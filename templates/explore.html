@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CareerCast — Career Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#f2f3f0;--panel:#fff;--border:#dfe1da;--border-strong:#bcc0b4;
+    --text:#1b1d19;--muted:#565a50;--muted-2:#888c7f;
+    --accent:#1f3a2e;--accent-soft:#e9ede7;
+    --error-bg:#fbeeec;--error-text:#96352a;--error-border:#eecac4;
+    --c1:#2f6f4e;--c1-bg:#e7f2ea;--c1-border:#c9e0d0;
+    --c2:#b5772b;--c2-bg:#faf0e1;--c2-border:#efd9b3;
+    --c3:#3d5f95;--c3-bg:#e8edf7;--c3-border:#c8d5ec;
+    --c4:#8a4e8f;--c4-bg:#f3e9f4;--c4-border:#e2cde3;
+    --c5:#b64f3d;--c5-bg:#f9e9e5;--c5-border:#edccc2;
+    --skill-bg:#eef1e9;--skill-text:#33513e;--skill-border:#d3dbc9;
+    --stamp-off-bg:#f7ece2;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace;}
+  .hidden{display:none !important;}
+  .top-rule{height:4px;background:linear-gradient(90deg,var(--c1) 0 20%,var(--c2) 20% 40%,var(--c3) 40% 60%,var(--c4) 60% 80%,var(--c5) 80% 100%);}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 48px;border-bottom:1px solid var(--border);background:var(--panel);flex-wrap:wrap;gap:12px;}
+  .brand-block{display:flex;align-items:baseline;gap:12px;}
+  .brand{font-family:'Source Serif 4',serif;font-weight:600;font-size:21px;color:var(--text);letter-spacing:0.2px;}
+  .brand-sub{font-size:12px;color:var(--muted-2);font-weight:500;}
+  nav{display:flex;align-items:center;gap:24px;}
+  nav a{color:var(--muted);text-decoration:none;font-size:13.5px;font-weight:500;}
+  nav a:hover{color:var(--text);}
+  .btn-primary{background:var(--accent);color:#fff;border:none;border-radius:3px;padding:9px 16px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;text-decoration:none;display:inline-block;cursor:pointer;transition:background .15s;}
+  .btn-primary:hover{background:#13261e;}
+  .wrap{max-width:1200px;margin:0 auto;padding:40px 48px 80px;}
+  .eyebrow{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted-2);font-weight:600;margin:0 0 10px;}
+
+  /* hero */
+  .page-hero{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:36px;gap:24px;flex-wrap:wrap;}
+  .page-hero-copy{max-width:560px;}
+  .page-hero-copy h1{font-family:'Source Serif 4',serif;font-size:30px;font-weight:600;margin:0 0 12px;line-height:1.25;}
+  .page-hero-copy p{color:var(--muted);font-size:14.5px;line-height:1.6;margin:0;}
+  .hero-stats{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-end;}
+  .hstat{text-align:center;}
+  .hstat .num{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:600;color:var(--accent);}
+  .hstat .lbl{font-size:11.5px;color:var(--muted-2);}
+
+  /* search + filter bar */
+  .filter-bar{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:18px 22px;margin-bottom:24px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+  .search-wrap{flex:1;min-width:220px;position:relative;}
+  .search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:15px;height:15px;opacity:0.4;}
+  .search-input{width:100%;padding:9px 12px 9px 32px;background:#fbfbfa;border:1px solid var(--border);border-radius:3px;font-family:'Inter',sans-serif;font-size:13.5px;color:var(--text);outline:none;}
+  .search-input:focus{border-color:var(--accent);}
+  .sort-select{padding:9px 12px;background:#fbfbfa;border:1px solid var(--border);border-radius:3px;font-family:'Inter',sans-serif;font-size:13px;color:var(--text);outline:none;cursor:pointer;}
+  .sort-select:focus{border-color:var(--accent);}
+  .filter-count{font-size:12px;color:var(--muted-2);font-family:'IBM Plex Mono',monospace;white-space:nowrap;}
+
+  /* category grid */
+  .category-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:40px;}
+  .cat-card{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:20px 22px;cursor:pointer;transition:border-color .15s,box-shadow .15s;position:relative;}
+  .cat-card:hover,.cat-card.active{border-color:var(--accent);box-shadow:0 2px 14px rgba(31,58,46,0.09);}
+  .cat-card.active{background:var(--accent-soft);}
+  .cat-card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}
+  .cat-card-name{font-family:'Source Serif 4',serif;font-size:16px;font-weight:600;}
+  .cat-card-badge{font-family:'IBM Plex Mono',monospace;font-size:10px;padding:3px 8px;border-radius:2px;background:var(--skill-bg);color:var(--skill-text);border:1px solid var(--skill-border);white-space:nowrap;}
+  .core-preview{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;}
+  .core-chip{font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:3px 7px;border-radius:2px;background:var(--c1-bg);color:var(--c1);border:1px solid var(--c1-border);}
+  .core-chip.more{background:var(--accent-soft);color:var(--muted-2);border-color:var(--border);}
+  .cat-card-footer{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--muted-2);}
+  .cat-card-footer .rec-count{font-family:'IBM Plex Mono',monospace;}
+
+  /* no results */
+  .no-results-msg{text-align:center;padding:48px;color:var(--muted-2);font-size:13.5px;}
+
+  /* detail panel */
+  .detail-panel{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:28px 32px;margin-bottom:32px;}
+  .detail-panel.hidden{display:none;}
+  .detail-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:16px;flex-wrap:wrap;}
+  .detail-head h2{font-family:'Source Serif 4',serif;font-size:24px;font-weight:600;margin:0;}
+  .detail-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .action-btn{padding:8px 14px;border-radius:3px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block;border:1px solid var(--border-strong);color:var(--text);background:var(--panel);transition:border-color .12s,background .12s;}
+  .action-btn:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);}
+  .action-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .action-btn.primary:hover{background:#13261e;}
+  .close-btn{background:none;border:none;cursor:pointer;font-size:20px;color:var(--muted-2);padding:0;line-height:1;}
+  .close-btn:hover{color:var(--text);}
+
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  @media(max-width:760px){.detail-grid{grid-template-columns:1fr;}}
+  .detail-section{margin-bottom:4px;}
+  .detail-section h4{font-size:11px;text-transform:uppercase;letter-spacing:0.7px;color:var(--muted-2);font-weight:600;margin:0 0 10px;}
+  .skill-pill-row{display:flex;flex-wrap:wrap;gap:6px;}
+  .skill-pill{font-family:'IBM Plex Mono',monospace;font-size:11.5px;padding:4px 9px;border-radius:3px;border:1px solid;}
+  .skill-pill.core{background:var(--c1-bg);color:var(--c1);border-color:var(--c1-border);}
+  .skill-pill.rec{background:var(--c2-bg);color:var(--c2);border-color:var(--c2-border);}
+
+  .chart-area{position:relative;height:220px;}
+
+  /* compare section */
+  .compare-bar{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:20px 24px;margin-bottom:28px;}
+  .compare-bar-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;}
+  .compare-bar-head h3{font-family:'Source Serif 4',serif;font-size:18px;font-weight:600;margin:0;}
+  .compare-selects{display:flex;gap:10px;flex-wrap:wrap;}
+  .csel{padding:8px 12px;background:#fbfbfa;border:1px solid var(--border);border-radius:3px;font-family:'Inter',sans-serif;font-size:13px;color:var(--text);outline:none;min-width:200px;}
+  .csel:focus{border-color:var(--accent);}
+  .compare-btn{background:var(--accent);color:#fff;border:none;border-radius:3px;padding:9px 16px;font-family:'Inter',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
+  .compare-btn:hover{background:#13261e;}
+  .compare-chart-area{position:relative;height:300px;margin-top:16px;}
+
+  footer{color:var(--muted-2);font-size:11.5px;font-family:'IBM Plex Mono',monospace;padding:26px 0 10px;border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+<div class="top-rule"></div>
+<div class="topbar">
+  <div class="brand-block">
+    <div class="brand">CareerCast</div>
+    <div class="brand-sub">Career Explorer</div>
+  </div>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/tool">Analyze resume</a>
+    <a href="/dashboard">Dashboard</a>
+    <a class="btn-primary" href="/explore">Explore</a>
+    <a href="/courses">Courses</a>
+    <a href="/skill-gap">Skill gap</a>
+  </nav>
+</div>
+
+<div class="wrap">
+  <!-- Hero -->
+  <div class="page-hero">
+    <div class="page-hero-copy">
+      <p class="eyebrow mono">Career explorer</p>
+      <h1>Browse every career path and its skill map</h1>
+      <p>Explore all {{ total_categories }} job categories tracked by CareerCast. Click any card to see the full core &amp; recommended skill breakdown, then jump to gap analysis or course recommendations in one click.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><div class="num">{{ total_categories }}</div><div class="lbl">job categories</div></div>
+      <div class="hstat"><div class="num">{{ total_skills }}</div><div class="lbl">total skills tracked</div></div>
+    </div>
+  </div>
+
+  <!-- Compare tool -->
+  <div class="compare-bar">
+    <div class="compare-bar-head">
+      <h3>Compare two career paths</h3>
+      <div class="compare-selects">
+        <select class="csel" id="compare1">
+          <option value="">— Select role A —</option>
+        </select>
+        <select class="csel" id="compare2">
+          <option value="">— Select role B —</option>
+        </select>
+        <button class="compare-btn" onclick="runCompare()">Compare</button>
+      </div>
+    </div>
+    <div id="compareResult" class="hidden">
+      <div class="compare-chart-area">
+        <canvas id="compareChart"></canvas>
+      </div>
+      <div id="compareOverlap" style="margin-top:14px;font-size:13px;color:var(--muted);"></div>
+    </div>
+  </div>
+
+  <!-- Search + filter -->
+  <div class="filter-bar">
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input class="search-input" id="searchInput" placeholder="Search job categories or skills…" oninput="filterCards()">
+    </div>
+    <select class="sort-select" id="sortSelect" onchange="filterCards()">
+      <option value="alpha">A → Z</option>
+      <option value="core-desc">Most core skills</option>
+      <option value="core-asc">Fewest core skills</option>
+      <option value="total-desc">Most total skills</option>
+    </select>
+    <span class="filter-count" id="filterCount"></span>
+  </div>
+
+  <!-- Inline detail panel (hidden until a card is clicked) -->
+  <div class="detail-panel hidden" id="detailPanel">
+    <div class="detail-head">
+      <div>
+        <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted-2);font-weight:600;margin:0 0 6px;">Selected career</p>
+        <h2 id="detailName">—</h2>
+      </div>
+      <div class="detail-actions">
+        <a class="action-btn" id="detailGapLink" href="#">Analyze my gap</a>
+        <a class="action-btn" id="detailCoursesLink" href="#">View courses</a>
+        <button class="close-btn" onclick="closeDetail()">✕</button>
+      </div>
+    </div>
+    <div class="detail-grid">
+      <div>
+        <div class="detail-section" style="margin-bottom:16px;">
+          <h4>Core skills</h4>
+          <div class="skill-pill-row" id="detailCore"></div>
+        </div>
+        <div class="detail-section">
+          <h4>Recommended skills</h4>
+          <div class="skill-pill-row" id="detailRec"></div>
+        </div>
+      </div>
+      <div>
+        <div class="chart-area">
+          <canvas id="detailChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Career card grid -->
+  <div class="category-grid" id="categoryGrid"></div>
+  <div class="no-results-msg hidden" id="noResults">No categories match your search.</div>
+</div>
+
+<footer class="wrap" style="padding-top:16px;">Skill taxonomy is curated manually and updated periodically. Not a reflection of any single employer's requirements.</footer>
+
+<script>
+const JOB_SKILLS = {{ job_skills | tojson }};
+const CATEGORIES = Object.keys(JOB_SKILLS).sort();
+
+let detailChartInst = null, compareChartInst = null;
+let activeCard = null;
+
+const PALETTE = ['#2f6f4e','#b5772b','#3d5f95','#8a4e8f','#b64f3d'];
+const CAT_COLORS = {};
+CATEGORIES.forEach((c,i) => { CAT_COLORS[c] = PALETTE[i%PALETTE.length]; });
+
+function esc(s){ const d=document.createElement('div');d.textContent=s;return d.innerHTML; }
+
+(function init(){
+  // Populate compare selects
+  ['compare1','compare2'].forEach(id => {
+    const sel = document.getElementById(id);
+    CATEGORIES.forEach(c => {
+      const o = document.createElement('option');
+      o.value=c; o.textContent=c; sel.appendChild(o);
+    });
+  });
+
+  // URL param
+  const params = new URLSearchParams(window.location.search);
+  const jobParam = params.get('job');
+
+  renderCards(CATEGORIES);
+
+  if(jobParam && JOB_SKILLS[jobParam]){
+    setTimeout(()=>{
+      const card = document.querySelector(`.cat-card[data-job="${CSS.escape(jobParam)}"]`);
+      if(card) openDetail(jobParam, card);
+    }, 100);
+  }
+})();
+
+function renderCards(list){
+  const grid = document.getElementById('categoryGrid');
+  grid.innerHTML = '';
+  document.getElementById('filterCount').textContent = list.length + ' of ' + CATEGORIES.length + ' shown';
+  if(!list.length){
+    document.getElementById('noResults').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('noResults').classList.add('hidden');
+
+  list.forEach(job => {
+    const skills = JOB_SKILLS[job] || {};
+    const core = skills.core || [];
+    const rec  = skills.recommended || [];
+    const previewChips = core.slice(0,3).map(s=>`<span class="core-chip">${esc(s)}</span>`).join('');
+    const moreCount = core.length - 3;
+
+    const card = document.createElement('div');
+    card.className = 'cat-card';
+    card.dataset.job = job;
+    card.setAttribute('role','button');
+    card.setAttribute('tabindex','0');
+    card.innerHTML = `
+      <div class="cat-card-head">
+        <span class="cat-card-name">${esc(job)}</span>
+        <span class="cat-card-badge">${core.length + rec.length} skills</span>
+      </div>
+      <div class="core-preview">
+        ${previewChips}
+        ${moreCount>0?`<span class="core-chip more">+${moreCount} more</span>`:''}
+      </div>
+      <div class="cat-card-footer">
+        <span>${core.length} core skills</span>
+        <span class="rec-count">${rec.length} recommended</span>
+      </div>`;
+
+    card.addEventListener('click', () => openDetail(job, card));
+    card.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' ') openDetail(job,card); });
+    grid.appendChild(card);
+  });
+}
+
+function filterCards(){
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const sort = document.getElementById('sortSelect').value;
+
+  let filtered = CATEGORIES.filter(job => {
+    if(!q) return true;
+    if(job.toLowerCase().includes(q)) return true;
+    const skills = JOB_SKILLS[job]||{};
+    const allSkills = [...(skills.core||[]),...(skills.recommended||[])];
+    return allSkills.some(s=>s.toLowerCase().includes(q));
+  });
+
+  filtered.sort((a,b) => {
+    const sa=JOB_SKILLS[a]||{}, sb=JOB_SKILLS[b]||{};
+    if(sort==='alpha') return a.localeCompare(b);
+    if(sort==='core-desc') return (sb.core?.length||0)-(sa.core?.length||0);
+    if(sort==='core-asc') return (sa.core?.length||0)-(sb.core?.length||0);
+    if(sort==='total-desc'){
+      const ta=(sa.core?.length||0)+(sa.recommended?.length||0);
+      const tb=(sb.core?.length||0)+(sb.recommended?.length||0);
+      return tb-ta;
+    }
+    return 0;
+  });
+
+  renderCards(filtered);
+
+  // re-apply active state
+  if(activeCard){
+    const el = document.querySelector(`.cat-card[data-job="${CSS.escape(activeCard)}"]`);
+    if(el) el.classList.add('active');
+  }
+}
+
+function openDetail(job, cardEl){
+  activeCard = job;
+  document.querySelectorAll('.cat-card').forEach(c=>c.classList.remove('active'));
+  if(cardEl) cardEl.classList.add('active');
+
+  const skills = JOB_SKILLS[job]||{};
+  const core = skills.core||[];
+  const rec  = skills.recommended||[];
+
+  document.getElementById('detailName').textContent = job;
+  document.getElementById('detailGapLink').href = `/skill-gap?job=${encodeURIComponent(job)}`;
+  document.getElementById('detailCoursesLink').href = `/courses?job=${encodeURIComponent(job)}`;
+
+  document.getElementById('detailCore').innerHTML =
+    core.map(s=>`<span class="skill-pill core">${esc(s)}</span>`).join('') || '<span style="color:var(--muted-2);font-size:13px;">None listed</span>';
+  document.getElementById('detailRec').innerHTML =
+    rec.map(s=>`<span class="skill-pill rec">${esc(s)}</span>`).join('') || '<span style="color:var(--muted-2);font-size:13px;">None listed</span>';
+
+  // Doughnut
+  if(detailChartInst) detailChartInst.destroy();
+  const ctx = document.getElementById('detailChart').getContext('2d');
+  detailChartInst = new Chart(ctx,{
+    type:'doughnut',
+    data:{
+      labels:['Core skills','Recommended'],
+      datasets:[{data:[core.length,rec.length],backgroundColor:['#2f6f4e','#b5772b'],borderWidth:0}]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,cutout:'56%',
+      plugins:{legend:{position:'bottom',labels:{font:{family:"'Inter'"},boxWidth:10,padding:12}}}
+    }
+  });
+
+  const panel = document.getElementById('detailPanel');
+  panel.classList.remove('hidden');
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function closeDetail(){
+  document.getElementById('detailPanel').classList.add('hidden');
+  document.querySelectorAll('.cat-card').forEach(c=>c.classList.remove('active'));
+  activeCard = null;
+  if(detailChartInst){ detailChartInst.destroy(); detailChartInst=null; }
+}
+
+function runCompare(){
+  const jobA = document.getElementById('compare1').value;
+  const jobB = document.getElementById('compare2').value;
+  if(!jobA||!jobB||jobA===jobB){
+    alert('Select two different job categories to compare.');
+    return;
+  }
+  const sa = JOB_SKILLS[jobA]||{}, sb = JOB_SKILLS[jobB]||{};
+  const allA = new Set([...(sa.core||[]),...(sa.recommended||[])].map(s=>s.toLowerCase()));
+  const allB = new Set([...(sb.core||[]),...(sb.recommended||[])].map(s=>s.toLowerCase()));
+
+  const onlyA = [...allA].filter(s=>!allB.has(s)).length;
+  const onlyB = [...allB].filter(s=>!allA.has(s)).length;
+  const shared = [...allA].filter(s=>allB.has(s)).length;
+
+  if(compareChartInst) compareChartInst.destroy();
+  const ctx = document.getElementById('compareChart').getContext('2d');
+  const labels = [jobA+' only', 'Shared', jobB+' only'];
+  compareChartInst = new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:jobA,data:[onlyA,shared,0],backgroundColor:'rgba(47,111,78,0.7)',borderColor:'#2f6f4e',borderWidth:2,borderRadius:3},
+        {label:jobB,data:[0,shared,onlyB],backgroundColor:'rgba(181,119,43,0.7)',borderColor:'#b5772b',borderWidth:2,borderRadius:3},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{font:{family:"'Inter'"},boxWidth:12,padding:14}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{family:"'Inter'",size:12}}},
+        y:{beginAtZero:true,ticks:{stepSize:1,font:{family:"'IBM Plex Mono'",size:11}},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false}}
+      }
+    }
+  });
+
+  document.getElementById('compareOverlap').innerHTML =
+    `<strong>${shared}</strong> skills are shared between <em>${esc(jobA)}</em> and <em>${esc(jobB)}</em>. `
+    + `<em>${esc(jobA)}</em> requires ${onlyA} unique skills; <em>${esc(jobB)}</em> requires ${onlyB} unique skills.`;
+  document.getElementById('compareResult').classList.remove('hidden');
+}
+</script>
+</body>
+</html>

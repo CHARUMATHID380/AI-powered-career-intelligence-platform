@@ -2,3 +2,17 @@ nltk_data/
 __pycache__/ 
 .vercel
 .env*
+
+venv/
+fastapi_service/venv/
+__pycache__/
+*.pyc
+.vercel/
+venv/
+__pycache__/
+*.pyc
+.env
+.env.local
+*.log
+.DS_Store
+node_modules/
