@@ -1,1 +1,37 @@
-nltk_data/ *.pickle *.model tests/ docs/ *.md .git/nltk_data/ .git/ __pycache__/ *.pyc train_model.py render_backend/ fastapi_service/
+# ML/model artifacts - keep out of serverless functions
+nltk_data/
+*.pickle
+*.pkl
+*.model
+*.h5
+*.joblib
+
+# Training scripts - not needed at runtime
+train_model.py
+train_*.py
+
+# Backend services not meant for Vercel
+render_backend/
+fastapi_service/
+
+# Docs & tests
+docs/
+tests/
+*.md
+
+# Git & cache
+.git/
+.gitignore
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment & logs
+.env.local
+.env.*.local
+*.log
+
+# OS/editor junk
+.DS_Store
+.vscode/
+.idea/
