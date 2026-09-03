@@ -1,3 +1,18 @@
-version https://git-lfs.github.com/spec/v1
-oid sha256:ec8a45ffaec3bad58e56dc9638047af6e57d002aaca015be56ef113e541e1f31
-size 1133
+{
+  "rewrites": [
+    { "source": "/", "destination": "/api/index" },
+    { "source": "/tool", "destination": "/api/index" },
+    { "source": "/dashboard", "destination": "/api/index" },
+    { "source": "/courses", "destination": "/api/index" },
+    { "source": "/skill-gap", "destination": "/api/index" },
+    { "source": "/explore", "destination": "/api/index" },
+    { "source": "/app", "destination": "/api/index" },
+    { "source": "/api/categories", "destination": "/api/index" },
+    { "source": "/api/job_skills", "destination": "/api/index" },
+    { "source": "/api/job_skills/:cat", "destination": "/api/index" },
+    { "source": "/api/predict", "destination": "/api/predict" },
+    { "source": "/api/predict_narrow", "destination": "/api/predict_narrow" },
+    { "source": "/api/gap_report", "destination": "/api/gap_report" },
+    { "source": "/api/recommend", "destination": "/api/recommend" }
+  ]
+}
