@@ -2,12 +2,14 @@ services:
   - type: web
     name: careercast
     env: python
-    region: singapore   # closest to India
+    region: singapore
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn dev_server:app --workers 1 --timeout 120
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.0
+        value: 3.11.9
       - key: FLASK_ENV
         value: production
+      - key: MISE_PYTHON_GITHUB_ATTESTATIONS
+        value: "false"
