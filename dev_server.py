@@ -1,21 +1,51 @@
+"""
+CareerCast — Master Flask application
+======================================
+Entry point for both local development and Render deployment.
+
+Local:   python dev_server.py
+Render:  gunicorn dev_server:app
+"""
+
 import importlib.util
 import os
 import sys
 
-# Add root directory to sys.path
+# ── Startup: download NLTK data if not already present ──────────────────────
+import nltk
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(BASE_DIR)
+NLTK_DATA_DIR = os.path.join(BASE_DIR, "nltk_data")
+
+# Always add local nltk_data to search path
+if NLTK_DATA_DIR not in nltk.data.path:
+    nltk.data.path.insert(0, NLTK_DATA_DIR)
+
+# On Render (and other cloud hosts) /tmp is writable — download there as fallback
+TMP_NLTK = "/tmp/nltk_data"
+if TMP_NLTK not in nltk.data.path:
+    nltk.data.path.insert(0, TMP_NLTK)
+
+def _ensure_nltk():
+    needed = ["stopwords", "wordnet", "omw-1.4"]
+    for pkg in needed:
+        try:
+            if pkg == "stopwords":
+                nltk.data.find("corpora/stopwords")
+            elif pkg == "wordnet":
+                nltk.data.find("corpora/wordnet")
+        except LookupError:
+            nltk.download(pkg, download_dir=NLTK_DATA_DIR, quiet=True)
+            nltk.download(pkg, download_dir=TMP_NLTK, quiet=True)
+
+_ensure_nltk()
+
+# ── Add root to sys.path ─────────────────────────────────────────────────────
+sys.path.insert(0, BASE_DIR)
 
 from flask import Flask
 
-# Each api/<name>/index.py is written as a standalone Vercel Python
-# function (its own `app = Flask(__name__)` with the full route already
-# declared, e.g. @app.route("/api/predict", ...)). There's no `handler`
-# attribute and no __init__.py making `api.predict` importable as a
-# package, so we load each index.py directly off disk and copy its
-# routes onto one master Flask app instead.
-
-
+# ── Submodule loader ─────────────────────────────────────────────────────────
 def load_submodule(name, rel_path):
     path = os.path.join(BASE_DIR, rel_path)
     spec = importlib.util.spec_from_file_location(name, path)
@@ -23,9 +53,7 @@ def load_submodule(name, rel_path):
     spec.loader.exec_module(module)
     return module
 
-
-# Master app — serves static/ from project root so new pages can
-# reference /static/... assets if needed in the future.
+# ── Master app ───────────────────────────────────────────────────────────────
 app = Flask(
     __name__,
     static_folder=os.path.join(BASE_DIR, "static"),
@@ -33,15 +61,15 @@ app = Flask(
 )
 
 SUBMODULES = [
-    ("careercast_index",          "api/index/index.py"),           # page routes + data API
+    ("careercast_index",          "api/index/index.py"),
     ("careercast_predict",        "api/predict/index.py"),
     ("careercast_predict_narrow", "api/predict_narrow/index.py"),
     ("careercast_gap_report",     "api/gap_report/index.py"),
     ("careercast_recommend",      "api/recommend/index.py"),
-    # ── Milestone 4 additions ──────────────────────────────────────
-    ("careercast_cohort",         "api/cohort/index.py"),          # batch cohort analysis
-    ("careercast_compare",        "api/compare/index.py"),         # side-by-side comparison
-    ("careercast_pdf_report",     "api/pdf_report/index.py"),      # PDF export
+    # Milestone 4
+    ("careercast_cohort",         "api/cohort/index.py"),
+    ("careercast_compare",        "api/compare/index.py"),
+    ("careercast_pdf_report",     "api/pdf_report/index.py"),
 ]
 
 for mod_name, rel_path in SUBMODULES:
@@ -58,5 +86,8 @@ for mod_name, rel_path in SUBMODULES:
             methods=rule.methods,
         )
 
-if __name__ == '__main__':
-    app.run(port=5001, debug=True)
+if __name__ == "__main__":
+    # Local development only — Render uses gunicorn
+    port = int(os.environ.get("PORT", 5001))
+    debug = os.environ.get("FLASK_ENV") == "development"
+    app.run(host="0.0.0.0", port=port, debug=debug)
