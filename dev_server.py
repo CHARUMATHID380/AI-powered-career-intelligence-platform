@@ -33,11 +33,15 @@ app = Flask(
 )
 
 SUBMODULES = [
-    ("careercast_index", "api/index/index.py"),          # page routes + data API
-    ("careercast_predict", "api/predict/index.py"),
+    ("careercast_index",          "api/index/index.py"),           # page routes + data API
+    ("careercast_predict",        "api/predict/index.py"),
     ("careercast_predict_narrow", "api/predict_narrow/index.py"),
-    ("careercast_gap_report", "api/gap_report/index.py"),
-    ("careercast_recommend", "api/recommend/index.py"),
+    ("careercast_gap_report",     "api/gap_report/index.py"),
+    ("careercast_recommend",      "api/recommend/index.py"),
+    # ── Milestone 4 additions ──────────────────────────────────────
+    ("careercast_cohort",         "api/cohort/index.py"),          # batch cohort analysis
+    ("careercast_compare",        "api/compare/index.py"),         # side-by-side comparison
+    ("careercast_pdf_report",     "api/pdf_report/index.py"),      # PDF export
 ]
 
 for mod_name, rel_path in SUBMODULES:
@@ -55,4 +59,4 @@ for mod_name, rel_path in SUBMODULES:
         )
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(port=5001, debug=True)

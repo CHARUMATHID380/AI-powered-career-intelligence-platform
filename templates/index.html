@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -7,484 +7,468 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg: #f2f3f0;
-    --panel: #ffffff;
-    --border: #dfe1da;
-    --border-strong: #bcc0b4;
-    --text: #1b1d19;
-    --muted: #565a50;
-    --muted-2: #888c7f;
-    --accent: #1f3a2e;
-    --accent-soft: #e9ede7;
-    --rule: #c8cbc0;
-    --skill-bg: #eef1e9;
-    --skill-text: #33513e;
-    --skill-border: #d3dbc9;
-    --error-bg: #fbeeec;
-    --error-text: #96352a;
-    --error-border: #eecac4;
-    --stamp-ready-bg: #eaf1e6;
-    --stamp-ready-text: #2f5b3f;
-    --stamp-off-bg: #f7ece2;
-    --stamp-off-text: #8a5a24;
+:root{
+  --bg:#f2f3f0;--panel:#fff;--border:#dfe1da;--border-strong:#bcc0b4;
+  --text:#1b1d19;--muted:#565a50;--muted-2:#888c7f;
+  --accent:#1f3a2e;--accent-soft:#e9ede7;
+  --error-bg:#fbeeec;--error-text:#96352a;--error-border:#eecac4;
+  --gap-bg:#fff8ec;--gap-text:#7a4a00;--gap-border:#ecd7a8;
+  --c1:#2f6f4e;--c1-bg:#e7f2ea;--c1-border:#c9e0d0;
+  --c2:#b5772b;--c2-bg:#faf0e1;--c2-border:#efd9b3;
+  --c3:#3d5f95;--c3-bg:#e8edf7;--c3-border:#c8d5ec;
+  --c4:#8a4e8f;--c4-bg:#f3e9f4;--c4-border:#e2cde3;
+  --c5:#b64f3d;--c5-bg:#f9e9e5;--c5-border:#edccc2;
+  --skill-bg:#eef1e9;--skill-text:#33513e;--skill-border:#d3dbc9;
+  --stamp-off-bg:#f7ece2;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased;}
+.mono{font-family:'IBM Plex Mono',ui-monospace,monospace;}
+.hidden{display:none!important;}
 
-    /* categorical accent palette, used for ranked results + skill chips */
-    --c1: #2f6f4e;  --c1-bg: #e7f2ea;  --c1-border: #c9e0d0;
-    --c2: #b5772b;  --c2-bg: #faf0e1;  --c2-border: #efd9b3;
-    --c3: #3d5f95;  --c3-bg: #e8edf7;  --c3-border: #c8d5ec;
-    --c4: #8a4e8f;  --c4-bg: #f3e9f4;  --c4-border: #e2cde3;
-    --c5: #b64f3d;  --c5-bg: #f9e9e5;  --c5-border: #edccc2;
-  }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;}
-  body{
-    background:var(--bg);
-    color:var(--text);
-    font-family:'Inter', -apple-system, sans-serif;
-    min-height:100vh;
-    -webkit-font-smoothing:antialiased;
-  }
-  .mono{
-    font-family:'IBM Plex Mono', ui-monospace, monospace;
-  }
-  .top-rule{
-    height:4px;
-    background:linear-gradient(90deg, var(--c1) 0 20%, var(--c2) 20% 40%, var(--c3) 40% 60%, var(--c4) 60% 80%, var(--c5) 80% 100%);
-  }
+/* top rule */
+.top-rule{height:4px;background:linear-gradient(90deg,var(--c1) 0 20%,var(--c2) 20% 40%,var(--c3) 40% 60%,var(--c4) 60% 80%,var(--c5) 80% 100%);}
 
-  .topbar{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:20px 48px;
-    border-bottom:1px solid var(--border);
-    background:var(--panel);
-    flex-wrap:wrap; gap:12px;
-  }
-  .brand-block{ display:flex; align-items:baseline; gap:12px; }
-  .brand{
-    font-family:'Source Serif 4', serif;
-    font-weight:600;font-size:21px;color:var(--text);
-    letter-spacing:0.2px;
-  }
-  .brand-sub{
-    font-size:12px;color:var(--muted-2);
-    font-weight:500;
-  }
-  .doc-meta{
-    display:flex;align-items:center;gap:14px;
-    font-size:11.5px;color:var(--muted-2);
-    letter-spacing:0.3px;
-  }
-  .doc-meta .ref{ color:var(--muted); }
-  .status-pill{
-    display:inline-flex;align-items:center;gap:6px;
-    padding:4px 10px;border-radius:3px;
-    font-size:10.5px;letter-spacing:0.6px;font-weight:600;
-    text-transform:uppercase;
-  }
-  .status-pill.ready{ background:var(--c1-bg); color:var(--c1); border:1px solid var(--c1-border); }
-  .status-pill.offline{ background:var(--c5-bg); color:var(--c5); border:1px solid var(--c5-border); }
-  .status-pill .dot{
-    width:6px;height:6px;border-radius:50%;
-    background:currentColor;
-  }
+/* topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 48px;border-bottom:1px solid var(--border);background:var(--panel);flex-wrap:wrap;gap:10px;}
+.brand-block{display:flex;align-items:baseline;gap:10px;}
+.brand{font-family:'Source Serif 4',serif;font-weight:600;font-size:20px;color:var(--text);}
+.brand-sub{font-size:12px;color:var(--muted-2);font-weight:500;}
+.topnav{display:flex;align-items:center;gap:2px;flex-wrap:wrap;}
+.topnav a{padding:6px 12px;border-radius:3px;font-size:13px;font-weight:500;color:var(--muted);text-decoration:none;transition:color .12s,background .12s;}
+.topnav a:hover{color:var(--text);background:var(--accent-soft);}
+.topnav a.current{color:var(--accent);background:var(--accent-soft);font-weight:600;}
+.doc-meta{display:flex;align-items:center;gap:12px;font-size:11.5px;color:var(--muted-2);}
+.status-pill{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:3px;font-size:10.5px;letter-spacing:.5px;font-weight:600;text-transform:uppercase;}
+.status-pill.ready{background:var(--c1-bg);color:var(--c1);border:1px solid var(--c1-border);}
+.status-pill.offline{background:var(--c5-bg);color:var(--c5);border:1px solid var(--c5-border);}
+.status-pill .dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
 
-  .wrap{
-    max-width:1120px;margin:0 auto;padding:44px 48px 90px;
-  }
-  .eyebrow{
-    font-size:11px;letter-spacing:1.2px;text-transform:uppercase;
-    color:var(--muted-2);font-weight:600;margin:0 0 14px;
-  }
-  .hero{ margin-bottom:36px; max-width:680px; }
-  .hero h1{
-    font-family:'Source Serif 4', serif;
-    font-size:29px;line-height:1.28;margin:0 0 12px;
-    font-weight:600;color:var(--text);
-  }
-  .hero p{
-    color:var(--muted);line-height:1.6;font-size:14.5px;margin:0;
-  }
+/* page tabs */
+.page-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--panel);padding:0 48px;}
+.page-tab{padding:11px 18px;font-size:13px;font-weight:500;color:var(--muted);background:none;border:none;border-bottom:2.5px solid transparent;cursor:pointer;font-family:'Inter',sans-serif;transition:color .12s,border-color .12s;}
+.page-tab:hover{color:var(--text);}
+.page-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600;}
 
-  .grid{
-    display:grid;grid-template-columns: 0.95fr 1.05fr;gap:22px;align-items:start;
-  }
-  @media (max-width: 900px){ .grid{grid-template-columns:1fr;} }
+/* pages */
+.page{display:none;}
+.page.active{display:block;}
 
-  .panel{
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:4px;
-    padding:26px 28px;
-  }
-  .panel-title{
-    font-size:11px;text-transform:uppercase;letter-spacing:1px;
-    color:var(--muted-2);margin:0 0 18px;font-weight:600;
-  }
+/* wrap */
+.wrap{max-width:1120px;margin:0 auto;padding:36px 48px 80px;}
+.eyebrow{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted-2);font-weight:600;margin:0 0 10px;}
+.hero{margin-bottom:28px;max-width:680px;}
+.hero h1{font-family:'Source Serif 4',serif;font-size:28px;line-height:1.28;margin:0 0 10px;font-weight:600;}
+.hero p{color:var(--muted);line-height:1.6;font-size:14px;margin:0;}
 
-  .tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:18px;}
-  .tab-btn{
-    padding:9px 4px;margin-right:26px;
-    background:none;border:none;border-bottom:2px solid transparent;
-    color:var(--muted);font-family:'Inter',sans-serif;font-size:13.5px;font-weight:500;
-    cursor:pointer;transition:color .15s ease, border-color .15s ease;
-  }
-  .tab-btn.active{ color:var(--accent); border-bottom-color:var(--accent); }
+/* panel */
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:24px 26px;}
+.panel-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted-2);margin:0 0 16px;font-weight:600;}
 
-  textarea{
-    width:100%;min-height:240px;resize:vertical;
-    background:#fbfbfa;border:1px solid var(--border);
-    border-radius:3px;color:var(--text);
-    font-family:'Inter',sans-serif;font-size:13.5px;line-height:1.6;
-    padding:14px;outline:none;
-  }
-  textarea:focus{border-color:var(--accent);}
-  textarea::placeholder{color:var(--muted-2);}
+/* grid */
+.grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:20px;align-items:start;}
+@media(max-width:900px){.grid{grid-template-columns:1fr;}}
 
-  .dropzone{
-    border:1.5px dashed var(--border-strong);
-    border-radius:3px;
-    padding:36px 20px;
-    text-align:center;
-    color:var(--muted);
-    cursor:pointer;
-    transition:border-color .15s ease, background .15s ease;
-    font-size:13.5px;
-  }
-  .dropzone.drag{ border-color:var(--accent); background:var(--accent-soft); }
-  .dropzone strong{color:var(--text);}
-  .dropzone .filename{
-    margin-top:10px;color:var(--skill-text);font-size:13px;font-weight:500;
-    font-family:'IBM Plex Mono', monospace;
-  }
-  input[type=file]{display:none;}
-  .hidden{display:none !important;}
+/* tabs (paste/upload) */
+.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:16px;}
+.tab-btn{padding:8px 0;margin-right:22px;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:13.5px;font-weight:500;cursor:pointer;transition:color .12s,border-color .12s;}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
 
-  .run-btn{
-    margin-top:18px;width:100%;
-    background:var(--accent);
-    color:#fff;border:none;border-radius:3px;
-    padding:12px 20px;font-family:'Inter',sans-serif;
-    font-size:14px;font-weight:600;
-    cursor:pointer;
-    display:flex;align-items:center;justify-content:center;gap:10px;
-    transition:background .15s ease;
-  }
-  .run-btn:hover{ background:#13261e; }
-  .run-btn:disabled{opacity:0.5;cursor:not-allowed;}
+/* textarea */
+textarea{width:100%;min-height:220px;resize:vertical;background:#fbfbfa;border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'Inter',sans-serif;font-size:13.5px;line-height:1.6;padding:12px;outline:none;}
+textarea:focus{border-color:var(--accent);}
+textarea::placeholder{color:var(--muted-2);}
 
-  /* typewriter-style processing indicator, no spinner icon */
-  .processing{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:13px;letter-spacing:0.5px;
-  }
-  .processing::after{
-    content:'';
-    display:inline-block;width:7px;height:13px;margin-left:2px;
-    background:currentColor;vertical-align:-2px;
-    animation:blink 0.9s steps(1) infinite;
-  }
-  @keyframes blink{ 50%{ opacity:0; } }
+/* dropzone */
+.dropzone{border:1.5px dashed var(--border-strong);border-radius:3px;padding:32px 20px;text-align:center;color:var(--muted);cursor:pointer;transition:border-color .12s,background .12s;font-size:13.5px;user-select:none;}
+.dropzone:hover,.dropzone.drag{border-color:var(--accent);background:var(--accent-soft);}
+.dropzone strong{color:var(--text);}
+.filename{margin-top:8px;color:var(--skill-text);font-size:12.5px;font-weight:500;font-family:'IBM Plex Mono',monospace;}
 
-  .error-box{
-    margin-top:14px;padding:11px 14px;border-radius:3px;
-    background:var(--error-bg);border:1px solid var(--error-border);
-    color:var(--error-text);font-size:13px;
-  }
-  .warn-box{
-    margin-bottom:24px;padding:12px 16px;border-radius:3px;
-    background:var(--stamp-off-bg);border:1px solid #ecd3ae;
-    color:#8a5a24;font-size:13.5px;
-  }
+/* run button */
+.run-btn{margin-top:14px;width:100%;background:var(--accent);color:#fff;border:none;border-radius:3px;padding:11px 20px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .12s;}
+.run-btn:hover{background:#13261e;}
+.run-btn:disabled{opacity:.5;cursor:not-allowed;}
+.run-btn.secondary{background:#fff;color:var(--accent);border:1.5px solid var(--accent);}
+.run-btn.secondary:hover{background:var(--accent-soft);}
 
-  .empty-state{
-    display:flex;flex-direction:column;align-items:center;justify-content:center;
-    min-height:300px;color:var(--muted-2);text-align:center;gap:8px;font-size:13.5px;
-  }
-  .empty-state .mono{ font-size:11px;letter-spacing:0.8px;color:var(--muted-2); }
+/* processing cursor */
+.processing{font-family:'IBM Plex Mono',monospace;font-size:13px;}
+.processing::after{content:'';display:inline-block;width:7px;height:13px;margin-left:2px;background:currentColor;vertical-align:-2px;animation:blink .9s steps(1) infinite;}
+@keyframes blink{50%{opacity:0;}}
 
-  table.results-table{
-    width:100%;border-collapse:collapse;
-  }
-  table.results-table thead th{
-    text-align:left;font-family:'IBM Plex Mono', monospace;
-    font-size:10.5px;text-transform:uppercase;letter-spacing:0.8px;
-    color:var(--muted-2);font-weight:600;padding-bottom:10px;
-    border-bottom:1px solid var(--border);
-  }
-  table.results-table thead th.num{ text-align:right; }
-  table.results-table tbody td{
-    padding:12px 0;border-bottom:1px solid var(--border);
-    font-size:13.5px;vertical-align:middle;
-  }
-  table.results-table tbody tr:last-child td{ border-bottom:none; }
-  table.results-table td.rank{
-    color:var(--muted-2); width:28px;
-    font-family:'IBM Plex Mono', monospace; font-size:12.5px;
-  }
-  table.results-table td.job{ font-weight:600; width:34%; }
-  table.results-table td.bar-cell{ width:auto; }
-  table.results-table td.pct{
-    text-align:right;width:56px;font-weight:600;
-    font-family:'IBM Plex Mono', monospace; font-size:13px;
-  }
-  .bar-track{
-    height:6px;border-radius:2px;background:var(--accent-soft);overflow:hidden;
-  }
-  .bar-fill{
-    height:100%;border-radius:2px;width:0%;
-    background:var(--accent);
-    transition:width 600ms ease;
-  }
-  tr.rank1 td.job{ color:var(--text); }
-  tr.rank1 td.rank{ color:var(--c1); font-weight:600; }
+/* error/warn */
+.error-box{margin-top:12px;padding:10px 13px;border-radius:3px;background:var(--error-bg);border:1px solid var(--error-border);color:var(--error-text);font-size:13px;}
+.warn-box{margin-bottom:20px;padding:11px 15px;border-radius:3px;background:var(--stamp-off-bg);border:1px solid #ecd3ae;color:#8a5a24;font-size:13.5px;}
 
-  tr.c1 .bar-fill{ background:var(--c1); } tr.c1 td.pct{ color:var(--c1); }
-  tr.c2 .bar-fill{ background:var(--c2); } tr.c2 td.pct{ color:var(--c2); }
-  tr.c3 .bar-fill{ background:var(--c3); } tr.c3 td.pct{ color:var(--c3); }
-  tr.c4 .bar-fill{ background:var(--c4); } tr.c4 td.pct{ color:var(--c4); }
-  tr.c5 .bar-fill{ background:var(--c5); } tr.c5 td.pct{ color:var(--c5); }
+/* empty state */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:260px;color:var(--muted-2);text-align:center;gap:7px;font-size:13.5px;}
 
-  .section-divider{
-    margin:26px 0 16px;padding-top:22px;border-top:1px solid var(--border);
-  }
-  .section-divider h3{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:10.5px;text-transform:uppercase;letter-spacing:0.8px;
-    color:var(--muted-2);margin:0 0 12px;font-weight:600;
-  }
+/* results table */
+table.results-table{width:100%;border-collapse:collapse;}
+table.results-table thead th{text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted-2);font-weight:600;padding-bottom:9px;border-bottom:1px solid var(--border);}
+table.results-table thead th.num{text-align:right;}
+table.results-table tbody td{padding:10px 0;border-bottom:1px solid var(--border);font-size:13.5px;vertical-align:middle;}
+table.results-table tbody tr:last-child td{border-bottom:none;}
+table.results-table td.rank{color:var(--muted-2);width:28px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+table.results-table td.job{font-weight:600;width:34%;}
+table.results-table td.pct{text-align:right;width:52px;font-weight:600;font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+.bar-track{height:5px;border-radius:2px;background:var(--accent-soft);overflow:hidden;}
+.bar-fill{height:100%;border-radius:2px;width:0;background:var(--accent);transition:width 600ms ease;}
+tr.rank1 td.job{color:var(--text);}
+tr.rank1 td.rank{color:var(--c1);font-weight:600;}
+tr.c1 .bar-fill{background:var(--c1);}tr.c1 td.pct{color:var(--c1);}
+tr.c2 .bar-fill{background:var(--c2);}tr.c2 td.pct{color:var(--c2);}
+tr.c3 .bar-fill{background:var(--c3);}tr.c3 td.pct{color:var(--c3);}
+tr.c4 .bar-fill{background:var(--c4);}tr.c4 td.pct{color:var(--c4);}
+tr.c5 .bar-fill{background:var(--c5);}tr.c5 td.pct{color:var(--c5);}
 
-  .skills-row{ display:flex;flex-wrap:wrap;gap:8px; }
-  .skill-chip{
-    padding:5px 12px;border-radius:3px;font-size:12.5px;font-weight:500;
-    background:var(--skill-bg);color:var(--skill-text);
-    border:1px solid var(--skill-border);
-  }
-  .skill-chip.c1{ background:var(--c1-bg); color:var(--c1); border-color:var(--c1-border); }
-  .skill-chip.c2{ background:var(--c2-bg); color:var(--c2); border-color:var(--c2-border); }
-  .skill-chip.c3{ background:var(--c3-bg); color:var(--c3); border-color:var(--c3-border); }
-  .skill-chip.c4{ background:var(--c4-bg); color:var(--c4); border-color:var(--c4-border); }
-  .skill-chip.c5{ background:var(--c5-bg); color:var(--c5); border-color:var(--c5-border); }
-  .skills-empty{ color:var(--muted-2);font-size:13px; }
+/* section divider */
+.section-divider{margin:22px 0 14px;padding-top:18px;border-top:1px solid var(--border);}
+.section-divider h3{font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted-2);margin:0 0 10px;font-weight:600;}
 
-  .preview-text{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12px;color:var(--muted);
-    line-height:1.7;max-height:110px;overflow:auto;white-space:pre-wrap;
-    background:#fbfbfa;border:1px solid var(--border);border-radius:3px;padding:12px;
-  }
+/* skill chips */
+.skills-row{display:flex;flex-wrap:wrap;gap:7px;}
+.skill-chip{padding:4px 10px;border-radius:3px;font-size:12px;font-weight:500;background:var(--skill-bg);color:var(--skill-text);border:1px solid var(--skill-border);}
+.skill-chip.gap{background:var(--gap-bg);color:var(--gap-text);border-color:var(--gap-border);}
+.skill-chip.c1{background:var(--c1-bg);color:var(--c1);border-color:var(--c1-border);}
+.skill-chip.c2{background:var(--c2-bg);color:var(--c2);border-color:var(--c2-border);}
+.skill-chip.c3{background:var(--c3-bg);color:var(--c3);border-color:var(--c3-border);}
+.skill-chip.c4{background:var(--c4-bg);color:var(--c4);border-color:var(--c4-border);}
+.skill-chip.c5{background:var(--c5-bg);color:var(--c5);border-color:var(--c5-border);}
+.skills-empty{color:var(--muted-2);font-size:13px;}
 
-  footer{
-    color:var(--muted-2);font-size:11.5px;
-    font-family:'IBM Plex Mono', monospace;
-    padding:30px 0 10px;border-top:1px solid var(--border);margin-top:10px;
-  }
+/* preview text */
+.preview-text{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);line-height:1.7;max-height:100px;overflow:auto;white-space:pre-wrap;background:#fbfbfa;border:1px solid var(--border);border-radius:3px;padding:10px;}
 
-  /* --- Gap report integration --- */
-  table.results-table tbody tr.clickable{ cursor:pointer; transition:background .12s ease; }
-  table.results-table tbody tr.clickable:hover{ background:var(--accent-soft); }
-  table.results-table tbody tr.row-active{ background:var(--accent-soft); }
-  table.results-table tbody tr.row-active td.job{ color:var(--accent); }
-  .row-hint{
-    font-size:10.5px;color:var(--muted-2);margin:6px 0 0;
-    font-family:'IBM Plex Mono', monospace;letter-spacing:0.3px;
-  }
+/* gap report */
+table.results-table tbody tr.clickable{cursor:pointer;transition:background .12s;}
+table.results-table tbody tr.clickable:hover{background:var(--accent-soft);}
+table.results-table tbody tr.row-active{background:var(--accent-soft);}
+table.results-table tbody tr.row-active td.job{color:var(--accent);}
+.row-hint{font-size:10.5px;color:var(--muted-2);margin:5px 0 0;font-family:'IBM Plex Mono',monospace;}
+.gap-panel{margin-top:20px;padding-top:18px;border-top:1px solid var(--border);}
+.gap-panel-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted-2);font-weight:600;margin:0 0 4px;}
+.gap-panel-job{font-family:'Source Serif 4',serif;font-size:17px;font-weight:600;color:var(--text);margin:0 0 14px;}
+.gap-loading{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;padding:12px 0;}
+.gap-note{padding:9px 13px;border-radius:3px;font-size:12.5px;background:var(--stamp-off-bg);border:1px solid #ecd3ae;color:#8a5a24;margin-bottom:12px;}
+.skill-cluster{margin-bottom:14px;}
+.skill-cluster h4{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted-2);font-weight:600;margin:0 0 7px;}
+.pill-row{display:flex;flex-wrap:wrap;gap:6px;}
+.pill{font-family:'IBM Plex Mono',monospace;font-size:11.5px;padding:4px 9px;border-radius:3px;border:1px solid;}
+.pill.present{background:var(--c1-bg);color:var(--c1);border-color:var(--c1-border);}
+.pill.missing{background:var(--error-bg);color:var(--error-text);border-color:var(--error-border);}
+.suggestion-list{margin:0;padding:0;list-style:none;}
+.suggestion-list li{font-size:13px;line-height:1.55;color:var(--muted);padding:7px 0 7px 15px;border-bottom:1px solid var(--border);position:relative;}
+.suggestion-list li:last-child{border-bottom:none;}
+.suggestion-list.add li::before{content:'+';position:absolute;left:0;color:var(--c1);font-weight:700;}
+.suggestion-list.remove li::before{content:'\2212';position:absolute;left:0;color:var(--c5);font-weight:700;}
+.course-group{margin-bottom:10px;}
+.course-group .skill-label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted-2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:block;}
+.course-card{display:block;padding:8px 11px;margin-bottom:5px;border:1px solid var(--border);border-radius:3px;text-decoration:none;color:var(--text);font-size:13px;transition:border-color .12s;}
+.course-card:hover{border-color:var(--border-strong);}
+.course-card .course-channel{display:block;font-size:11.5px;color:var(--muted-2);margin-top:2px;}
+.course-card.unavailable{color:var(--muted-2);font-style:italic;cursor:default;}
+.gap-error{padding:10px 13px;border-radius:3px;background:var(--error-bg);border:1px solid var(--error-border);color:var(--error-text);font-size:13px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.gap-error button{background:none;border:1px solid var(--error-border);color:var(--error-text);border-radius:3px;padding:4px 9px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;}
+.gap-error button:hover{background:var(--error-border);}
 
-  .gap-panel{
-    margin-top:22px;padding-top:20px;border-top:1px solid var(--border);
-  }
-  .gap-panel-title{
-    font-size:11px;text-transform:uppercase;letter-spacing:1px;
-    color:var(--muted-2);font-weight:600;margin:0 0 4px;
-  }
-  .gap-panel-job{
-    font-family:'Source Serif 4', serif;font-size:17px;font-weight:600;
-    color:var(--text);margin:0 0 16px;
-  }
+/* PDF / CSV download button */
+.dl-btn{display:inline-flex;align-items:center;gap:7px;margin-top:14px;padding:7px 14px;background:none;border:1.5px solid var(--border-strong);border-radius:3px;color:var(--muted);font-size:12.5px;font-family:'IBM Plex Mono',monospace;cursor:pointer;transition:all .12s;}
+.dl-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);}
 
-  .gap-loading{
-    display:flex;align-items:center;gap:8px;
-    color:var(--muted);font-size:13px;padding:14px 0;
-  }
+/* ── cohort ── */
+.cohort-dropzone{border:1.5px dashed var(--border-strong);border-radius:3px;padding:26px 20px;text-align:center;color:var(--muted);cursor:pointer;transition:border-color .12s,background .12s;font-size:13.5px;margin-bottom:12px;}
+.cohort-dropzone:hover,.cohort-dropzone.drag{border-color:var(--accent);background:var(--accent-soft);}
+.cohort-file-list{list-style:none;padding:0;margin:0 0 10px;display:flex;flex-wrap:wrap;gap:6px;}
+.cohort-file-list li{font-size:11.5px;background:var(--skill-bg);color:var(--skill-text);border:1px solid var(--skill-border);border-radius:3px;padding:3px 9px;font-family:'IBM Plex Mono',monospace;}
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
+.kpi-card{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:14px 16px;text-align:center;}
+.kpi-card .val{font-family:'Source Serif 4',serif;font-size:24px;font-weight:700;color:var(--accent);}
+.kpi-card .lbl{font-size:11px;color:var(--muted-2);text-transform:uppercase;letter-spacing:.6px;margin-top:3px;font-family:'IBM Plex Mono',monospace;}
+.bar-chart{width:100%;}
+.bar-chart-row{display:flex;align-items:center;gap:9px;margin-bottom:6px;}
+.bar-chart-label{width:155px;font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0;}
+.bar-chart-track{flex:1;height:13px;background:var(--accent-soft);border-radius:2px;overflow:hidden;}
+.bar-chart-fill{height:100%;border-radius:2px;transition:width .5s ease;background:var(--accent);}
+.bar-chart-count{width:26px;text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);flex-shrink:0;}
+table.cohort-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+table.cohort-table thead th{text-align:left;font-family:'IBM Plex Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted-2);padding-bottom:7px;border-bottom:1px solid var(--border);}
+table.cohort-table tbody td{padding:7px 0;border-bottom:1px solid var(--border);vertical-align:top;}
+table.cohort-table tbody tr:last-child td{border-bottom:none;}
+table.cohort-table td.fn{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+table.cohort-table td.conf{font-weight:600;text-align:right;font-family:'IBM Plex Mono',monospace;padding-right:8px;}
 
-  .gap-note{
-    padding:10px 14px;border-radius:3px;font-size:12.5px;
-    background:var(--stamp-off-bg);border:1px solid #ecd3ae;color:#8a5a24;
-    margin-bottom:14px;
-  }
+/* ── compare ── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start;}
+@media(max-width:860px){.compare-grid{grid-template-columns:1fr;}}
+.compare-card{background:var(--panel);border:1px solid var(--border);border-radius:4px;padding:18px 20px;}
+.compare-card .card-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted-2);font-weight:600;margin:0 0 12px;font-family:'IBM Plex Mono',monospace;}
+.winner-banner{background:var(--c1-bg);border:1px solid var(--c1-border);border-radius:4px;padding:11px 16px;margin-bottom:16px;display:flex;align-items:center;gap:9px;font-size:13.5px;color:var(--c1);}
+.winner-banner .trophy{font-size:18px;}
+.compare-kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.compare-kpi-card{background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:9px 13px;}
+.compare-kpi-card .lbl{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted-2);font-family:'IBM Plex Mono',monospace;}
+.compare-kpi-card .val{font-size:15px;font-weight:700;color:var(--accent);margin-top:2px;}
+.compare-kpi-card .sub{font-size:11px;color:var(--muted-2);font-family:'IBM Plex Mono',monospace;}
 
-  .skill-cluster{ margin-bottom:16px; }
-  .skill-cluster h4{
-    font-size:11px;text-transform:uppercase;letter-spacing:0.6px;
-    color:var(--muted-2);font-weight:600;margin:0 0 8px;
-  }
-  .pill-row{ display:flex;flex-wrap:wrap;gap:7px; }
-  .pill{
-    font-family:'IBM Plex Mono', monospace;font-size:11.5px;
-    padding:4px 9px;border-radius:3px;border:1px solid;
-  }
-  .pill.present{ background:var(--c1-bg); color:var(--c1); border-color:var(--c1-border); }
-  .pill.missing{ background:var(--error-bg); color:var(--error-text); border-color:var(--error-border); }
-
-  .suggestion-list{ margin:0;padding:0;list-style:none; }
-  .suggestion-list li{
-    font-size:13px;line-height:1.55;color:var(--muted);
-    padding:8px 0 8px 16px;border-bottom:1px solid var(--border);
-    position:relative;
-  }
-  .suggestion-list li:last-child{ border-bottom:none; }
-  .suggestion-list.add li::before{ content:'+';position:absolute;left:0;color:var(--c1);font-weight:700; }
-  .suggestion-list.remove li::before{ content:'\2212';position:absolute;left:0;color:var(--c5);font-weight:700; }
-
-  .course-group{ margin-bottom:12px; }
-  .course-group .skill-label{
-    font-family:'IBM Plex Mono', monospace;font-size:11px;
-    color:var(--muted-2);text-transform:uppercase;letter-spacing:0.5px;
-    margin-bottom:6px;display:block;
-  }
-  .course-card{
-    display:block;padding:9px 12px;margin-bottom:6px;
-    border:1px solid var(--border);border-radius:3px;
-    text-decoration:none;color:var(--text);font-size:13px;
-    transition:border-color .12s ease;
-  }
-  .course-card:hover{ border-color:var(--border-strong); }
-  .course-card .course-channel{
-    display:block;font-size:11.5px;color:var(--muted-2);margin-top:2px;
-  }
-  .course-card.unavailable{
-    color:var(--muted-2);font-style:italic;cursor:default;
-  }
-
-  .gap-error{
-    padding:11px 14px;border-radius:3px;
-    background:var(--error-bg);border:1px solid var(--error-border);
-    color:var(--error-text);font-size:13px;display:flex;
-    align-items:center;justify-content:space-between;gap:12px;
-  }
-  .gap-error button{
-    background:none;border:1px solid var(--error-border);color:var(--error-text);
-    border-radius:3px;padding:5px 10px;font-size:12px;cursor:pointer;
-    font-family:'Inter',sans-serif;white-space:nowrap;
-  }
-  .gap-error button:hover{ background:var(--error-border); }
+footer{color:var(--muted-2);font-size:11.5px;font-family:'IBM Plex Mono',monospace;padding:22px 0 8px;border-top:1px solid var(--border);margin-top:8px;}
 </style>
 </head>
 <body>
 
-  <div class="top-rule"></div>
-  <div class="topbar">
-    <div class="brand-block">
-      <div class="brand">CareerCast</div>
-      <div class="brand-sub">Resume Screening Tool</div>
-    </div>
-    <div class="doc-meta mono">
-      <span class="ref">REF. CC-2026-04</span>
-      {% if model_ready %}
-      <span class="status-pill ready"><span class="dot"></span>Model ready</span>
-      {% else %}
-      <span class="status-pill offline"><span class="dot"></span>Model offline</span>
-      {% endif %}
-    </div>
+<div class="top-rule"></div>
+
+<!-- topbar -->
+<div class="topbar">
+  <div class="brand-block">
+    <div class="brand">CareerCast</div>
+    <div class="brand-sub">Resume Screening Tool</div>
   </div>
-
-  <div class="wrap">
-    <div class="hero">
-      <p class="eyebrow mono">Resume Evaluation</p>
-      <h1>Match a resume to the right job category</h1>
-      <p>Paste resume text, or upload a PDF, Word, or plain text file. The tool identifies key skills and scores the resume against each job category using a trained classification model.</p>
-    </div>
-
-    {% if not model_ready %}
-    <div class="warn-box">
-      Model not loaded — resume_job_classifier.joblib was not found next to app.py. Train the model first, then restart the server.
-      {% if model_error %}<br>Detail: {{ model_error }}{% endif %}
-    </div>
+  <nav class="topnav">
+    <a href="/tool" class="current">Analyze</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/skill-gap">Skill Gap</a>
+    <a href="/explore">Explore</a>
+    <a href="/courses">Courses</a>
+  </nav>
+  <div class="doc-meta mono">
+    <span>REF. CC-2026-04</span>
+    {% if model_ready %}
+    <span class="status-pill ready"><span class="dot"></span>Model ready</span>
+    {% else %}
+    <span class="status-pill offline"><span class="dot"></span>Model offline</span>
     {% endif %}
+  </div>
+</div>
 
-    <div class="grid">
-      <!-- INPUT PANEL -->
-      <div class="panel">
-        <p class="panel-title mono">Resume</p>
-        <div class="tabs">
-          <button class="tab-btn active" id="tab-paste-btn" onclick="switchTab('paste')">Paste text</button>
-          <button class="tab-btn" id="tab-file-btn" onclick="switchTab('file')">Upload file</button>
-        </div>
+<!-- page tabs -->
+<div class="page-tabs">
+  <button class="page-tab active" onclick="switchPage('analyze',this)">Analyze Resume</button>
+  <button class="page-tab" onclick="switchPage('cohort',this)">Cohort Analytics</button>
+  <button class="page-tab" onclick="switchPage('compare',this)">Career Comparison</button>
+</div>
 
-        <div id="tab-paste">
-          <textarea id="resume-textarea" placeholder="Paste the full resume text here…"></textarea>
-        </div>
+<div class="wrap">
 
-        <div id="tab-file" class="hidden">
-          <label class="dropzone" id="dropzone" for="file-input">
-            <div id="dropzone-default">
-              <div><strong>Click to choose a file</strong> or drag it here</div>
-              <div style="margin-top:6px;color:var(--muted-2);">PDF, DOCX, or TXT — up to 8MB</div>
-            </div>
-            <div class="filename" id="filename-display"></div>
-          </label>
-          <input type="file" id="file-input" accept=".pdf,.docx,.txt">
-        </div>
+{% if not model_ready %}
+<div class="warn-box">
+  Model not loaded — <strong>resume_job_classifier.joblib</strong> was not found. Train the model first, then restart.
+  {% if model_error %}<br>Detail: {{ model_error }}{% endif %}
+</div>
+{% endif %}
 
-        <button class="run-btn" id="run-btn" onclick="runPrediction()" {% if not model_ready %}disabled{% endif %}>
-          <span id="run-btn-label">Analyze resume</span>
-        </button>
+<!-- ═══════════════════════════════════════
+     PAGE 1 — Analyze Resume
+═══════════════════════════════════════ -->
+<div id="page-analyze" class="page active">
+  <div class="hero">
+    <p class="eyebrow mono">Resume Evaluation</p>
+    <h1>Match a resume to the right job category</h1>
+    <p>Paste resume text, or upload a PDF, Word, or plain text file. The tool identifies key skills and scores the resume against each job category.</p>
+  </div>
 
-        <div id="error-box" class="error-box hidden"></div>
+  <div class="grid">
+    <!-- INPUT -->
+    <div class="panel">
+      <p class="panel-title mono">Resume</p>
+      <div class="tabs">
+        <button class="tab-btn active" id="tab-paste-btn" onclick="switchTab('paste')">Paste text</button>
+        <button class="tab-btn" id="tab-file-btn" onclick="switchTab('file')">Upload file</button>
       </div>
 
-      <!-- RESULTS PANEL -->
-      <div class="panel">
-        <p class="panel-title mono">Assessment</p>
-        <div id="results-empty" class="empty-state">
-          <span class="mono">— NO RECORD —</span>
-          <span>No resume analyzed yet.</span>
-        </div>
+      <div id="tab-paste">
+        <textarea id="resume-textarea" placeholder="Paste the full resume text here…"></textarea>
+      </div>
 
-        <div id="results-content" class="hidden">
-          <table class="results-table">
-            <thead>
-              <tr><th>Rank</th><th>Job category</th><th></th><th class="num">Match</th></tr>
-            </thead>
-            <tbody id="results-tbody"></tbody>
-          </table>
-          <p class="row-hint">Click a row to see the skill gap report for that role.</p>
-
-          <div id="gap-panel" class="gap-panel hidden"></div>
-
-          <div class="section-divider">
-            <h3>Skills identified</h3>
-            <div class="skills-row" id="skills-row"></div>
-          </div>
-
-          <div class="section-divider">
-            <h3>Text read from resume</h3>
-            <div class="preview-text" id="preview-text"></div>
-          </div>
+      <div id="tab-file" class="hidden">
+        <div class="dropzone" id="dropzone" onclick="triggerFileInput()">
+          <div><strong>Click to choose a file</strong> or drag it here</div>
+          <div style="margin-top:6px;font-size:12.5px;color:var(--muted-2);">PDF, DOCX, or TXT — up to 8 MB</div>
+          <div class="filename" id="filename-display"></div>
         </div>
       </div>
+
+      <!-- hidden file input — lives OUTSIDE hidden div so it's always accessible -->
+      <input type="file" id="file-input" accept=".pdf,.docx,.txt" style="display:none;">
+
+      <button class="run-btn" id="run-btn" onclick="runPrediction()" {% if not model_ready %}disabled{% endif %}>
+        <span id="run-btn-label">Analyze resume</span>
+      </button>
+      <div id="error-box" class="error-box hidden"></div>
     </div>
 
-    <footer>Match percentages are the model's own confidence estimate, not a certified skills match.</footer>
+    <!-- RESULTS -->
+    <div class="panel">
+      <p class="panel-title mono">Assessment</p>
+      <div id="results-empty" class="empty-state">
+        <span class="mono">— NO RECORD —</span>
+        <span>No resume analyzed yet.</span>
+      </div>
+      <div id="results-content" class="hidden">
+        <table class="results-table">
+          <thead><tr><th>Rank</th><th>Job category</th><th></th><th class="num">Match</th></tr></thead>
+          <tbody id="results-tbody"></tbody>
+        </table>
+        <p class="row-hint">Click a row to see the skill gap report for that role.</p>
+        <div id="gap-panel" class="gap-panel hidden"></div>
+        <div class="section-divider">
+          <h3>Skills identified</h3>
+          <div class="skills-row" id="skills-row"></div>
+        </div>
+        <div class="section-divider">
+          <h3>Skill gaps for top role</h3>
+          <div class="skills-row" id="gaps-row"></div>
+        </div>
+        <div class="section-divider">
+          <h3>Text read from resume</h3>
+          <div class="preview-text" id="preview-text"></div>
+        </div>
+        <button class="dl-btn" id="pdf-btn" onclick="downloadSinglePDF()">↓ Download PDF report</button>
+      </div>
+    </div>
   </div>
+</div><!-- /page-analyze -->
+
+
+<!-- ═══════════════════════════════════════
+     PAGE 2 — Cohort Analytics
+═══════════════════════════════════════ -->
+<div id="page-cohort" class="page">
+  <div class="hero">
+    <p class="eyebrow mono">Cohort Analytics</p>
+    <h1>Analyse a group of resumes at once</h1>
+    <p>Upload multiple PDF, DOCX, or TXT files. The tool scores every resume, shows category distribution, top skills, and lets you download results as CSV.</p>
+  </div>
+
+  <div class="panel" style="max-width:620px;margin-bottom:20px;">
+    <p class="panel-title mono">Upload resumes</p>
+    <div class="cohort-dropzone" id="cohort-dropzone" onclick="document.getElementById('cohort-input').click()">
+      <strong>Click to choose files</strong> or drag them here<br>
+      <span style="color:var(--muted-2);font-size:12.5px;">PDF, DOCX, TXT — multiple files allowed</span>
+    </div>
+    <input type="file" id="cohort-input" accept=".pdf,.docx,.txt" multiple style="display:none;">
+    <ul class="cohort-file-list" id="cohort-file-list"></ul>
+    <button class="run-btn" id="cohort-btn" onclick="runCohort()" {% if not model_ready %}disabled{% endif %}>
+      <span id="cohort-btn-label">Analyse cohort</span>
+    </button>
+    <div id="cohort-error" class="error-box hidden"></div>
+  </div>
+
+  <div id="cohort-empty" class="empty-state" style="min-height:160px;">
+    <span class="mono">— NO DATA —</span>
+    <span>Upload resumes and click Analyse cohort.</span>
+  </div>
+
+  <div id="cohort-results" class="hidden">
+    <div class="kpi-row">
+      <div class="kpi-card"><div class="val" id="kpi-total">0</div><div class="lbl">Resumes</div></div>
+      <div class="kpi-card"><div class="val" id="kpi-avg">—</div><div class="lbl">Avg Confidence</div></div>
+      <div class="kpi-card"><div class="val" id="kpi-cats">—</div><div class="lbl">Categories</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1.1fr 0.9fr;gap:20px;margin-bottom:24px;">
+      <div class="panel"><p class="panel-title mono">Category distribution</p><div class="bar-chart" id="cat-chart"></div></div>
+      <div class="panel"><p class="panel-title mono">Top skills across cohort</p><div class="bar-chart" id="skill-chart"></div></div>
+    </div>
+    <div class="panel">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <p class="panel-title mono" style="margin:0;">Per-resume results</p>
+        <button class="dl-btn" style="margin:0;" onclick="downloadCSV()">↓ Download CSV</button>
+      </div>
+      <table class="cohort-table">
+        <thead><tr><th>File</th><th>Top match</th><th>Confidence</th><th>Skills found</th></tr></thead>
+        <tbody id="cohort-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div><!-- /page-cohort -->
+
+
+<!-- ═══════════════════════════════════════
+     PAGE 3 — Career Comparison
+═══════════════════════════════════════ -->
+<div id="page-compare" class="page">
+  <div class="hero">
+    <p class="eyebrow mono">Career Comparison</p>
+    <h1>Compare two candidates side-by-side</h1>
+    <p>Paste or upload a resume for each candidate. The tool ranks both, declares the stronger fit, and lets you download PDF reports.</p>
+  </div>
+
+  <div class="compare-grid" style="margin-bottom:16px;">
+    <div class="compare-card">
+      <p class="card-title">Candidate A</p>
+      <textarea id="cmp-text-a" rows="7" placeholder="Paste Candidate A's resume…" style="min-height:0;"></textarea>
+      <div class="cohort-dropzone" style="margin-top:10px;padding:14px;" onclick="document.getElementById('cmp-file-a').click()">
+        <span id="cmp-fn-a">Or upload PDF / DOCX / TXT</span>
+      </div>
+      <input type="file" id="cmp-file-a" accept=".pdf,.docx,.txt" style="display:none;">
+    </div>
+    <div class="compare-card">
+      <p class="card-title">Candidate B</p>
+      <textarea id="cmp-text-b" rows="7" placeholder="Paste Candidate B's resume…" style="min-height:0;"></textarea>
+      <div class="cohort-dropzone" style="margin-top:10px;padding:14px;" onclick="document.getElementById('cmp-file-b').click()">
+        <span id="cmp-fn-b">Or upload PDF / DOCX / TXT</span>
+      </div>
+      <input type="file" id="cmp-file-b" accept=".pdf,.docx,.txt" style="display:none;">
+    </div>
+  </div>
+
+  <button class="run-btn" style="max-width:260px;" id="cmp-btn" onclick="runCompare()" {% if not model_ready %}disabled{% endif %}>
+    <span id="cmp-btn-label">Compare candidates</span>
+  </button>
+  <div id="cmp-error" class="error-box hidden" style="max-width:560px;margin-top:10px;"></div>
+
+  <div id="cmp-empty" class="empty-state" style="min-height:140px;margin-top:18px;">
+    <span class="mono">— NO COMPARISON —</span>
+    <span>Paste or upload resumes for both candidates, then click Compare.</span>
+  </div>
+
+  <div id="cmp-results" class="hidden" style="margin-top:22px;">
+    <div class="winner-banner" id="winner-banner">
+      <span class="trophy">🏆</span>
+      <span id="winner-text"></span>
+    </div>
+    <div class="compare-kpi" id="cmp-kpi"></div>
+    <div class="compare-grid">
+      <div class="compare-card">
+        <p class="card-title" id="cmp-title-a">Candidate A</p>
+        <table class="results-table" id="cmp-table-a"></table>
+        <div class="section-divider" style="margin-top:8px;"><h3>Skills found</h3><div class="skills-row" id="cmp-skills-a"></div></div>
+        <div class="section-divider"><h3>Skill gaps</h3><div class="skills-row" id="cmp-gaps-a"></div></div>
+        <button class="dl-btn" onclick="downloadCmpPDF('a')">↓ PDF Report — A</button>
+      </div>
+      <div class="compare-card">
+        <p class="card-title" id="cmp-title-b">Candidate B</p>
+        <table class="results-table" id="cmp-table-b"></table>
+        <div class="section-divider" style="margin-top:8px;"><h3>Skills found</h3><div class="skills-row" id="cmp-skills-b"></div></div>
+        <div class="section-divider"><h3>Skill gaps</h3><div class="skills-row" id="cmp-gaps-b"></div></div>
+        <button class="dl-btn" onclick="downloadCmpPDF('b')">↓ PDF Report — B</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /page-compare -->
+
+<footer>Match percentages are the model's own confidence estimate, not a certified skills match.</footer>
+</div><!-- /wrap -->
 
 <script>
+// ── Helpers ────────────────────────────────────────────────────
+function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+const PAL = ['c1','c2','c3','c4','c5'];
+const FASTAPI_BASE = 'http://127.0.0.1:8000';
+
+// ── Page switching ─────────────────────────────────────────────
+function switchPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── Input tab switching (analyze page) ───────────────────────
 let activeTab = 'paste';
-let selectedFile = null;
-
-// TODO: replace with your deployed Render URL once live, e.g.
-// const FASTAPI_BASE_URL = 'https://careercast-gap-service.onrender.com';
-const FASTAPI_BASE_URL = 'http://127.0.0.1:8000';
-
-// Resume text captured from the last successful /predict call, used for
-// gap-report requests when a job row is clicked. `resumeTextTruncated` is
-// true when we only have Flask's preview snippet (file-upload case) rather
-// than the full extracted text — see note in runPrediction().
-let lastResumeText = '';
-let resumeTextTruncated = false;
-let activeGapJob = null;
-
-function switchTab(tab){
+function switchTab(tab) {
   activeTab = tab;
   document.getElementById('tab-paste').classList.toggle('hidden', tab !== 'paste');
   document.getElementById('tab-file').classList.toggle('hidden', tab !== 'file');
@@ -492,69 +476,74 @@ function switchTab(tab){
   document.getElementById('tab-file-btn').classList.toggle('active', tab === 'file');
 }
 
+// ── File picker trigger ────────────────────────────────────────
+function triggerFileInput() {
+  document.getElementById('file-input').click();
+}
+
+// ── Analyze page: file handling ───────────────────────────────
+let selectedFile = null;
 const fileInput = document.getElementById('file-input');
-const dropzone = document.getElementById('dropzone');
-
-fileInput.addEventListener('change', (e) => {
-  if (e.target.files.length){
+fileInput.addEventListener('change', function(e) {
+  if (e.target.files.length) {
     selectedFile = e.target.files[0];
-    document.getElementById('filename-display').textContent = selectedFile.name;
+    document.getElementById('filename-display').textContent = '✓ ' + selectedFile.name;
+    document.getElementById('dropzone').style.borderColor = 'var(--c1)';
   }
 });
 
-['dragenter','dragover'].forEach(evt => {
-  dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.add('drag'); });
-});
-['dragleave','drop'].forEach(evt => {
-  dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.remove('drag'); });
-});
-dropzone.addEventListener('drop', (e) => {
+// Drag & drop on analyze dropzone
+const dropzone = document.getElementById('dropzone');
+['dragenter','dragover'].forEach(ev => dropzone.addEventListener(ev, function(e){ e.preventDefault(); dropzone.classList.add('drag'); }));
+['dragleave','drop'].forEach(ev => dropzone.addEventListener(ev, function(e){ e.preventDefault(); dropzone.classList.remove('drag'); }));
+dropzone.addEventListener('drop', function(e) {
   e.preventDefault();
-  const file = e.dataTransfer.files[0];
-  if (file){
-    selectedFile = file;
+  const f = e.dataTransfer.files[0];
+  if (f) {
+    selectedFile = f;
     fileInput.files = e.dataTransfer.files;
-    document.getElementById('filename-display').textContent = file.name;
+    document.getElementById('filename-display').textContent = '✓ ' + f.name;
+    dropzone.style.borderColor = 'var(--c1)';
   }
 });
 
-function showError(msg){
-  const box = document.getElementById('error-box');
-  box.textContent = msg;
-  box.classList.remove('hidden');
-}
-function clearError(){
-  document.getElementById('error-box').classList.add('hidden');
-}
+// ── Error helpers ──────────────────────────────────────────────
+function showError(id, msg) { const b=document.getElementById(id); b.textContent=msg; b.classList.remove('hidden'); }
+function clearError(id) { document.getElementById(id).classList.add('hidden'); }
 
-async function runPrediction(){
-  clearError();
+// ── ANALYZE: run prediction ────────────────────────────────────
+let lastResult = null;
+let lastResumeText = '';
+let resumeTextTruncated = false;
+let activeGapJob = null;
+
+async function runPrediction() {
+  clearError('error-box');
   const btn = document.getElementById('run-btn');
   const label = document.getElementById('run-btn-label');
-  const formData = new FormData();
+  const fd = new FormData();
 
-  if (activeTab === 'paste'){
+  if (activeTab === 'paste') {
     const text = document.getElementById('resume-textarea').value.trim();
-    if (!text){ showError('Paste some resume text first.'); return; }
-    formData.append('resume_text', text);
+    if (!text) { showError('error-box', 'Paste some resume text first.'); return; }
+    fd.append('resume_text', text);
   } else {
-    if (!selectedFile){ showError('Choose a PDF, DOCX, or TXT file first.'); return; }
-    formData.append('resume_file', selectedFile);
+    if (!selectedFile) { showError('error-box', 'Choose a PDF, DOCX, or TXT file first.'); return; }
+    fd.append('resume_file', selectedFile);
   }
 
   btn.disabled = true;
   label.innerHTML = '<span class="processing">Analyzing</span>';
 
-  try{
-    const res = await fetch('/api/predict', { method:'POST', body: formData });
+  try {
+    const res = await fetch('/api/predict', { method: 'POST', body: fd });
     const data = await res.json();
-    if (!res.ok){ showError(data.error || 'Something went wrong.'); return; }
+    if (!res.ok) { showError('error-box', data.error || 'Something went wrong.'); return; }
 
-    // Capture resume text for later gap-report calls. If we pasted text,
-    // we already have the full thing. If we uploaded a file, prefer
-    // data.full_text if Flask sends it back; otherwise fall back to the
-    // (likely truncated) preview and flag it so the gap panel can warn.
-    if (activeTab === 'paste'){
+    lastResult = data;
+    lastResult.resume_name = selectedFile ? selectedFile.name : 'Pasted resume';
+
+    if (activeTab === 'paste') {
       lastResumeText = document.getElementById('resume-textarea').value.trim();
       resumeTextTruncated = false;
     } else {
@@ -562,208 +551,321 @@ async function runPrediction(){
       resumeTextTruncated = !data.full_text;
     }
 
-    // reset any previously shown gap report — it belonged to the last analysis
     activeGapJob = null;
     document.getElementById('gap-panel').classList.add('hidden');
     document.getElementById('gap-panel').innerHTML = '';
 
-    renderResults(data.results, data.preview, data.skills || []);
-  }catch(err){
-    showError('Could not reach the server.');
-  }finally{
+    renderAnalyzeResults(data.results, data.preview, data.skills || []);
+  } catch (err) {
+    showError('error-box', 'Could not reach the server.');
+  } finally {
     btn.disabled = false;
     label.textContent = 'Analyze resume';
   }
 }
 
-function renderResults(results, preview, skills){
+function renderAnalyzeResults(results, preview, skills) {
   document.getElementById('results-empty').classList.add('hidden');
   document.getElementById('results-content').classList.remove('hidden');
 
   const tbody = document.getElementById('results-tbody');
   tbody.innerHTML = '';
-  const palette = ['c1','c2','c3','c4','c5'];
-  results.forEach((r, i) => {
+  results.forEach(function(r, i) {
     const row = document.createElement('tr');
-    row.className = (i === 0 ? 'rank1 ' : '') + palette[i % palette.length] + ' clickable';
+    row.className = (i === 0 ? 'rank1 ' : '') + PAL[i % PAL.length] + ' clickable';
     row.dataset.job = r.job;
-    row.innerHTML = `
-      <td class="rank">${String(i+1).padStart(2,'0')}</td>
-      <td class="job">${r.job}</td>
-      <td class="bar-cell"><div class="bar-track"><div class="bar-fill" data-w="${r.score}"></div></div></td>
-      <td class="pct">${r.score}%</td>
-    `;
-    row.addEventListener('click', () => loadGapReport(r.job, row));
+    row.innerHTML = '<td class="rank">' + String(i+1).padStart(2,'0') + '</td>' +
+      '<td class="job">' + esc(r.job) + '</td>' +
+      '<td class="bar-cell"><div class="bar-track"><div class="bar-fill" data-w="' + r.score + '"></div></div></td>' +
+      '<td class="pct">' + r.score + '%</td>';
+    row.addEventListener('click', function() { loadGapReport(r.job, row); });
     tbody.appendChild(row);
   });
-  requestAnimationFrame(() => {
-    document.querySelectorAll('.bar-fill').forEach(el => {
-      el.style.width = el.getAttribute('data-w') + '%';
-    });
+  requestAnimationFrame(function() {
+    document.querySelectorAll('#results-tbody .bar-fill').forEach(function(el) { el.style.width = el.getAttribute('data-w') + '%'; });
   });
 
-  const skillsRow = document.getElementById('skills-row');
-  skillsRow.innerHTML = '';
-  if (skills.length){
-    const chipPalette = ['c1','c2','c3','c4','c5'];
-    skills.forEach((s, i) => {
-      const chip = document.createElement('span');
-      chip.className = 'skill-chip ' + chipPalette[i % chipPalette.length];
-      chip.textContent = s;
-      skillsRow.appendChild(chip);
+  // Skills found
+  const sr = document.getElementById('skills-row');
+  sr.innerHTML = skills.length
+    ? skills.map(function(s,i){ return '<span class="skill-chip ' + PAL[i%PAL.length] + '">' + esc(s) + '</span>'; }).join('')
+    : '<span class="skills-empty">No matching skills detected.</span>';
+
+  // Skill gaps — get from first result's job category
+  const gr = document.getElementById('gaps-row');
+  gr.innerHTML = '';
+  if (results.length) {
+    fetch('/api/gap_report', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ resume_text: lastResumeText || preview, job_category: results[0].job })
+    }).then(function(r){ return r.json(); }).then(function(data) {
+      const missing = (data.skills && data.skills.missing_core) ? data.skills.missing_core : [];
+      gr.innerHTML = missing.length
+        ? missing.slice(0,8).map(function(s){ return '<span class="skill-chip gap">' + esc(s) + '</span>'; }).join('')
+        : '<span class="skills-empty">No critical gaps detected.</span>';
+    }).catch(function() {
+      gr.innerHTML = '<span class="skills-empty">—</span>';
     });
-  } else {
-    skillsRow.innerHTML = '<span class="skills-empty">No matching skills from our keyword list were found in this resume.</span>';
   }
 
   document.getElementById('preview-text').textContent = preview;
 }
 
-function escapeHtml(str){
-  const div = document.createElement('div');
-  div.textContent = str;
-  return div.innerHTML;
-}
-
-function setActiveRow(row){
-  document.querySelectorAll('#results-tbody tr').forEach(tr => tr.classList.remove('row-active'));
+function setActiveRow(row) {
+  document.querySelectorAll('#results-tbody tr').forEach(function(tr){ tr.classList.remove('row-active'); });
   if (row) row.classList.add('row-active');
 }
 
-async function loadGapReport(jobCategory, row){
+async function loadGapReport(jobCategory, row) {
   const panel = document.getElementById('gap-panel');
-
-  if (!lastResumeText){
-    panel.classList.remove('hidden');
-    panel.innerHTML = `<div class="gap-error"><span>No resume text available for gap analysis. Try re-running the analysis.</span></div>`;
-    return;
-  }
-
+  if (!lastResumeText) { panel.classList.remove('hidden'); panel.innerHTML = '<div class="gap-error"><span>No resume text available.</span></div>'; return; }
   activeGapJob = jobCategory;
   setActiveRow(row);
   panel.classList.remove('hidden');
-  panel.innerHTML = `
-    <p class="gap-panel-title mono">Skill gap report</p>
-    <p class="gap-panel-job">${escapeHtml(jobCategory)}</p>
-    <div class="gap-loading"><span class="processing">Fetching gap analysis</span></div>
-  `;
+  panel.innerHTML = '<p class="gap-panel-title mono">Skill gap report</p><p class="gap-panel-job">' + esc(jobCategory) + '</p><div class="gap-loading"><span class="processing">Fetching gap analysis</span></div>';
 
-  try{
-    const res = await fetch(`${FASTAPI_BASE_URL}/gap-report`, {
+  try {
+    const res = await fetch(FASTAPI_BASE + '/gap-report', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ resume_text: lastResumeText, job_category: jobCategory })
     });
-
-    // Job category unknown to the gap-analysis taxonomy — degrade gracefully
-    // rather than showing a raw error, since Flask's classifier categories
-    // aren't guaranteed to match FastAPI's skill taxonomy.
-    if (res.status === 400){
-      if (activeGapJob !== jobCategory) return; // a newer click superseded this one
-      panel.innerHTML = `
-        <p class="gap-panel-title mono">Skill gap report</p>
-        <p class="gap-panel-job">${escapeHtml(jobCategory)}</p>
-        <div class="gap-error"><span>A detailed skill gap report isn't available for "${escapeHtml(jobCategory)}" yet.</span></div>
-      `;
+    if (res.status === 400) {
+      if (activeGapJob !== jobCategory) return;
+      panel.innerHTML = '<p class="gap-panel-title mono">Skill gap report</p><p class="gap-panel-job">' + esc(jobCategory) + '</p><div class="gap-error"><span>Detailed gap report not yet available for "' + esc(jobCategory) + '".</span></div>';
       return;
     }
-
-    if (!res.ok){
-      const errData = await res.json().catch(() => ({}));
-      throw new Error(errData.detail || `Server responded with ${res.status}`);
-    }
-
+    if (!res.ok) { const ed = await res.json().catch(function(){ return {}; }); throw new Error(ed.detail || 'Server error ' + res.status); }
     const data = await res.json();
-    if (activeGapJob !== jobCategory) return; // stale response, a different row was clicked meanwhile
-    renderGapReport(jobCategory, data);
-  }catch(err){
     if (activeGapJob !== jobCategory) return;
-    panel.innerHTML = `
-      <p class="gap-panel-title mono">Skill gap report</p>
-      <p class="gap-panel-job">${escapeHtml(jobCategory)}</p>
-      <div class="gap-error">
-        <span>Could not reach the gap analysis service. It may be waking up from idle (can take up to 30s on first request) — try again in a moment.</span>
-        <button onclick="loadGapReport('${jobCategory.replace(/'/g, "\\'")}', document.querySelector('#results-tbody tr.row-active'))">Retry</button>
-      </div>
-    `;
+    renderGapReport(jobCategory, data);
+  } catch (err) {
+    if (activeGapJob !== jobCategory) return;
+    panel.innerHTML = '<p class="gap-panel-title mono">Skill gap report</p><p class="gap-panel-job">' + esc(jobCategory) + '</p>' +
+      '<div class="gap-error"><span>Gap service unavailable (may need 30s to wake up). <button onclick="loadGapReport(\'' + jobCategory.replace(/'/g,"\\'") + '\', document.querySelector(\'#results-tbody tr.row-active\'))">Retry</button></span></div>';
   }
 }
 
-function renderGapReport(jobCategory, data){
+function renderGapReport(jobCategory, data) {
   const panel = document.getElementById('gap-panel');
   const skills = data.skills || {};
-  const suggestions = data.resume_suggestions || {};
+  const sugg = data.resume_suggestions || {};
   const courses = data.courses || [];
 
-  let truncatedNote = '';
-  if (resumeTextTruncated){
-    truncatedNote = `<div class="gap-note">This gap report is based on a text preview, not the full resume, since only a snippet was available for the uploaded file. Results may be incomplete.</div>`;
-  }
-
-  const presentCore = (skills.present_core || []).map(s => `<span class="pill present">${escapeHtml(s)}</span>`).join('');
-  const missingCore = (skills.missing_core || []).map(s => `<span class="pill missing">${escapeHtml(s)}</span>`).join('');
-  const presentRec = (skills.present_recommended || []).map(s => `<span class="pill present">${escapeHtml(s)}</span>`).join('');
-  const missingRec = (skills.missing_recommended || []).map(s => `<span class="pill missing">${escapeHtml(s)}</span>`).join('');
-
-  const addList = (suggestions.add || []).map(s => `<li>${escapeHtml(s)}</li>`).join('');
-  const removeList = (suggestions.remove || []).map(s => `<li>${escapeHtml(s)}</li>`).join('');
-
-  const courseGroups = courses.map(group => {
-    const results = group.results || [];
-    let items;
-    if (!results.length){
-      items = `<span class="course-card unavailable">No courses found for this skill.</span>`;
-    } else if (results[0] && results[0].error){
-      items = `<span class="course-card unavailable">${escapeHtml(results[0].error)}</span>`;
-    } else {
-      items = results.map(c => `
-        <a class="course-card" href="${escapeHtml(c.url || '#')}" target="_blank" rel="noopener noreferrer">
-          ${escapeHtml(c.title || 'Untitled')}
-          <span class="course-channel">${escapeHtml(c.channel || '')}</span>
-        </a>
-      `).join('');
-    }
-    return `
-      <div class="course-group">
-        <span class="skill-label mono">${escapeHtml(group.skill)}</span>
-        ${items}
-      </div>
-    `;
+  const note = resumeTextTruncated ? '<div class="gap-note">Gap report based on text preview — results may be incomplete for uploaded files.</div>' : '';
+  const pc = (skills.present_core||[]).map(function(s){ return '<span class="pill present">' + esc(s) + '</span>'; }).join('');
+  const mc = (skills.missing_core||[]).map(function(s){ return '<span class="pill missing">' + esc(s) + '</span>'; }).join('');
+  const pr = (skills.present_recommended||[]).map(function(s){ return '<span class="pill present">' + esc(s) + '</span>'; }).join('');
+  const mr = (skills.missing_recommended||[]).map(function(s){ return '<span class="pill missing">' + esc(s) + '</span>'; }).join('');
+  const addList = (sugg.add||[]).map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('');
+  const remList = (sugg.remove||[]).map(function(s){ return '<li>' + esc(s) + '</li>'; }).join('');
+  const courseHtml = courses.map(function(g) {
+    const items = (g.results||[]).length ? g.results.map(function(c){
+      if (c.error) return '<span class="course-card unavailable">' + esc(c.error) + '</span>';
+      return '<a class="course-card" href="' + esc(c.url||'#') + '" target="_blank" rel="noopener">' + esc(c.title||'Untitled') + '<span class="course-channel">' + esc(c.provider||c.channel||'') + '</span></a>';
+    }).join('') : '<span class="course-card unavailable">No courses found.</span>';
+    return '<div class="course-group"><span class="skill-label mono">' + esc(g.skill) + '</span>' + items + '</div>';
   }).join('');
 
-  panel.innerHTML = `
-    <p class="gap-panel-title mono">Skill gap report</p>
-    <p class="gap-panel-job">${escapeHtml(jobCategory)}</p>
-    ${truncatedNote}
+  panel.innerHTML = '<p class="gap-panel-title mono">Skill gap report</p><p class="gap-panel-job">' + esc(jobCategory) + '</p>' + note +
+    '<div class="skill-cluster"><h4>Core skills</h4><div class="pill-row">' + pc + mc + '</div></div>' +
+    ((pr||mr) ? '<div class="skill-cluster"><h4>Recommended skills</h4><div class="pill-row">' + pr + mr + '</div></div>' : '') +
+    (addList ? '<div class="skill-cluster"><h4>Suggested additions</h4><ul class="suggestion-list add">' + addList + '</ul></div>' : '') +
+    (remList ? '<div class="skill-cluster"><h4>Suggested removals</h4><ul class="suggestion-list remove">' + remList + '</ul></div>' : '') +
+    (courseHtml ? '<div class="skill-cluster"><h4>Recommended courses</h4>' + courseHtml + '</div>' : '');
+}
 
-    <div class="skill-cluster">
-      <h4>Core skills</h4>
-      <div class="pill-row">${presentCore}${missingCore || '<span class="skills-empty">All core skills present.</span>'}</div>
-    </div>
-    ${(presentRec || missingRec) ? `
-    <div class="skill-cluster">
-      <h4>Recommended skills</h4>
-      <div class="pill-row">${presentRec}${missingRec}</div>
-    </div>` : ''}
+// ── PDF helpers ────────────────────────────────────────────────
+async function _fetchPDF(payload) {
+  try {
+    const res = await fetch('/api/pdf_report', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) { const e = await res.json().catch(function(){ return {}; }); alert('PDF error: ' + (e.error||'Unknown')); return; }
+    const blob = new Blob([await res.arrayBuffer()], {type:'application/pdf'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = ((payload.resume_name||'report').replace(/[^a-z0-9_\-]/gi,'_')) + '.pdf';
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  } catch(e) { alert('PDF download failed: ' + e.message); }
+}
 
-    ${addList ? `
-    <div class="skill-cluster">
-      <h4>Suggested additions</h4>
-      <ul class="suggestion-list add">${addList}</ul>
-    </div>` : ''}
+function downloadSinglePDF() {
+  if (!lastResult) return;
+  _fetchPDF({
+    top_match: lastResult.results[0].job,
+    top_score: lastResult.results[0].score,
+    ranked_jobs: lastResult.results,
+    skills: lastResult.skills || [],
+    skills_suggested: [],
+    preview: lastResult.preview || '',
+    resume_name: lastResult.resume_name || 'resume'
+  });
+}
 
-    ${removeList ? `
-    <div class="skill-cluster">
-      <h4>Suggested removals</h4>
-      <ul class="suggestion-list remove">${removeList}</ul>
-    </div>` : ''}
+// ── COHORT ────────────────────────────────────────────────────
+let cohortFiles = [];
+let cohortData = null;
 
-    ${courseGroups ? `
-    <div class="skill-cluster">
-      <h4>Recommended courses</h4>
-      ${courseGroups}
-    </div>` : ''}
-  `;
+const cohortInput = document.getElementById('cohort-input');
+cohortInput.addEventListener('change', function(e) { updateCohortList(e.target.files); });
+
+const cohortDropzone = document.getElementById('cohort-dropzone');
+['dragenter','dragover'].forEach(function(ev){ cohortDropzone.addEventListener(ev, function(e){ e.preventDefault(); cohortDropzone.classList.add('drag'); }); });
+['dragleave','drop'].forEach(function(ev){ cohortDropzone.addEventListener(ev, function(e){ e.preventDefault(); cohortDropzone.classList.remove('drag'); }); });
+cohortDropzone.addEventListener('drop', function(e) {
+  e.preventDefault();
+  cohortInput.files = e.dataTransfer.files;
+  updateCohortList(e.dataTransfer.files);
+});
+
+function updateCohortList(files) {
+  cohortFiles = Array.from(files);
+  document.getElementById('cohort-file-list').innerHTML = cohortFiles.map(function(f){ return '<li>' + esc(f.name) + '</li>'; }).join('');
+}
+
+async function runCohort() {
+  clearError('cohort-error');
+  if (!cohortFiles.length) { showError('cohort-error', 'Select at least one file first.'); return; }
+  const btn = document.getElementById('cohort-btn');
+  const label = document.getElementById('cohort-btn-label');
+  btn.disabled = true; label.innerHTML = '<span class="processing">Analyzing</span>';
+  const fd = new FormData();
+  cohortFiles.forEach(function(f){ fd.append('resume_files', f); });
+  try {
+    const res = await fetch('/api/cohort', {method:'POST', body:fd});
+    const data = await res.json();
+    if (!res.ok) { showError('cohort-error', data.error||'Error.'); return; }
+    cohortData = data;
+    renderCohort(data);
+  } catch(e) { showError('cohort-error', 'Could not reach the server.'); }
+  finally { btn.disabled=false; label.textContent='Analyse cohort'; }
+}
+
+function renderCohort(data) {
+  document.getElementById('cohort-empty').classList.add('hidden');
+  document.getElementById('cohort-results').classList.remove('hidden');
+  document.getElementById('kpi-total').textContent = data.total;
+  document.getElementById('kpi-avg').textContent = data.avg_confidence + '%';
+  document.getElementById('kpi-cats').textContent = Object.keys(data.category_counts).length;
+
+  const catChart = document.getElementById('cat-chart');
+  catChart.innerHTML = '';
+  const cats = Object.entries(data.category_counts);
+  const maxCat = Math.max.apply(null, cats.map(function(e){ return e[1]; }));
+  cats.forEach(function(e, i) {
+    const pct = Math.round(e[1]/maxCat*100);
+    catChart.innerHTML += '<div class="bar-chart-row"><div class="bar-chart-label" title="' + esc(e[0]) + '">' + esc(e[0]) + '</div><div class="bar-chart-track"><div class="bar-chart-fill" style="width:' + pct + '%;background:var(--' + PAL[i%PAL.length] + ')"></div></div><div class="bar-chart-count">' + e[1] + '</div></div>';
+  });
+
+  const skillChart = document.getElementById('skill-chart');
+  skillChart.innerHTML = '';
+  const sks = Object.entries(data.top_skills);
+  const maxSk = Math.max.apply(null, sks.map(function(e){ return e[1]; }));
+  sks.forEach(function(e) {
+    const pct = Math.round(e[1]/maxSk*100);
+    skillChart.innerHTML += '<div class="bar-chart-row"><div class="bar-chart-label" title="' + esc(e[0]) + '">' + esc(e[0]) + '</div><div class="bar-chart-track"><div class="bar-chart-fill" style="width:' + pct + '%;background:var(--accent)"></div></div><div class="bar-chart-count">' + e[1] + '</div></div>';
+  });
+
+  const tbody = document.getElementById('cohort-tbody');
+  tbody.innerHTML = '';
+  data.rows.forEach(function(r, i) {
+    const clr = PAL[i%PAL.length];
+    tbody.innerHTML += '<tr><td class="fn" title="' + esc(r.file) + '">' + esc(r.file) + '</td><td><span class="skill-chip ' + clr + '">' + esc(r.top_match) + '</span></td><td class="conf" style="color:var(--' + clr + ')">' + r.confidence + '%</td><td style="font-size:12px;color:var(--muted)">' + ((r.skills||[]).slice(0,4).join(', ')||'—') + '</td></tr>';
+  });
+  (data.errors||[]).forEach(function(e) {
+    tbody.innerHTML += '<tr><td class="fn" style="color:var(--error-text)">' + esc(e.file) + '</td><td colspan="3" style="color:var(--error-text);font-size:12px;">' + esc(e.error) + '</td></tr>';
+  });
+}
+
+function downloadCSV() {
+  if (!cohortData) return;
+  const header = ['File','Top Match','Confidence (%)','Skills Found'];
+  const rows = cohortData.rows.map(function(r){ return ['"'+r.file+'"', '"'+r.top_match+'"', r.confidence, '"'+((r.skills||[]).join('; '))+'"']; });
+  const csv = [header].concat(rows).map(function(r){ return r.join(','); }).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'careercast_cohort.csv'; a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+}
+
+// ── COMPARE ───────────────────────────────────────────────────
+let cmpFileA = null, cmpFileB = null, cmpStore = null;
+
+document.getElementById('cmp-file-a').addEventListener('change', function(e){ if(e.target.files[0]){ cmpFileA=e.target.files[0]; document.getElementById('cmp-fn-a').textContent='✓ '+cmpFileA.name; } });
+document.getElementById('cmp-file-b').addEventListener('change', function(e){ if(e.target.files[0]){ cmpFileB=e.target.files[0]; document.getElementById('cmp-fn-b').textContent='✓ '+cmpFileB.name; } });
+
+async function runCompare() {
+  clearError('cmp-error');
+  const tA = document.getElementById('cmp-text-a').value.trim();
+  const tB = document.getElementById('cmp-text-b').value.trim();
+  if (!tA && !cmpFileA) { showError('cmp-error', 'Provide a resume for Candidate A.'); return; }
+  if (!tB && !cmpFileB) { showError('cmp-error', 'Provide a resume for Candidate B.'); return; }
+  const btn = document.getElementById('cmp-btn');
+  const label = document.getElementById('cmp-btn-label');
+  btn.disabled = true; label.innerHTML = '<span class="processing">Comparing</span>';
+  const fd = new FormData();
+  if (tA) fd.append('text_a', tA); else fd.append('file_a', cmpFileA);
+  if (tB) fd.append('text_b', tB); else fd.append('file_b', cmpFileB);
+  try {
+    const res = await fetch('/api/compare', {method:'POST', body:fd});
+    const data = await res.json();
+    if (!res.ok) { showError('cmp-error', data.error||'Error.'); return; }
+    cmpStore = data;
+    renderCompare(data);
+  } catch(e) { showError('cmp-error', 'Could not reach the server.'); }
+  finally { btn.disabled=false; label.textContent='Compare candidates'; }
+}
+
+function renderCompare(data) {
+  document.getElementById('cmp-empty').classList.add('hidden');
+  document.getElementById('cmp-results').classList.remove('hidden');
+  const a = data.a, b = data.b;
+  const winner = data.winner === 'a' ? a : b;
+  document.getElementById('winner-text').textContent = winner.label + ' is the stronger fit — ' + winner.top_match + ' at ' + winner.top_score.toFixed(1) + '% confidence';
+  document.getElementById('cmp-kpi').innerHTML =
+    '<div class="compare-kpi-card"><div class="lbl">Candidate A · Top match</div><div class="val">' + esc(a.top_match) + '</div><div class="sub">' + a.top_score.toFixed(1) + '%</div></div>' +
+    '<div class="compare-kpi-card"><div class="lbl">Candidate B · Top match</div><div class="val">' + esc(b.top_match) + '</div><div class="sub">' + b.top_score.toFixed(1) + '%</div></div>';
+  document.getElementById('cmp-title-a').textContent = a.label;
+  document.getElementById('cmp-title-b').textContent = b.label;
+  fillCmpTable('cmp-table-a', a.ranked_jobs);
+  fillCmpTable('cmp-table-b', b.ranked_jobs);
+  fillSkillChips('cmp-skills-a', a.skills||[], '');
+  fillSkillChips('cmp-skills-b', b.skills||[], '');
+  fillSkillChips('cmp-gaps-a', a.skills_suggested||[], 'gap');
+  fillSkillChips('cmp-gaps-b', b.skills_suggested||[], 'gap');
+}
+
+function fillCmpTable(tblId, results) {
+  const tbl = document.getElementById(tblId);
+  tbl.innerHTML = '<thead><tr><th>Rank</th><th>Job category</th><th></th><th class="num">Match</th></tr></thead><tbody></tbody>';
+  const tbody = tbl.querySelector('tbody');
+  results.forEach(function(r, i) {
+    const row = document.createElement('tr');
+    row.className = (i===0?'rank1 ':'')+PAL[i%PAL.length];
+    row.innerHTML = '<td class="rank">'+String(i+1).padStart(2,'0')+'</td><td class="job">'+esc(r.job)+'</td><td class="bar-cell"><div class="bar-track"><div class="bar-fill" data-w="'+r.score+'"></div></div></td><td class="pct">'+r.score+'%</td>';
+    tbody.appendChild(row);
+  });
+  requestAnimationFrame(function(){ tbl.querySelectorAll('.bar-fill').forEach(function(el){ el.style.width=el.getAttribute('data-w')+'%'; }); });
+}
+
+function fillSkillChips(elId, skills, extraCls) {
+  const el = document.getElementById(elId);
+  el.innerHTML = skills.length
+    ? skills.map(function(s,i){ return '<span class="skill-chip '+(extraCls||PAL[i%PAL.length])+'">'+esc(s)+'</span>'; }).join('')
+    : '<span class="skills-empty">None detected.</span>';
+}
+
+function downloadCmpPDF(side) {
+  if (!cmpStore) return;
+  const r = cmpStore[side];
+  _fetchPDF({ top_match:r.top_match, top_score:r.top_score, ranked_jobs:r.ranked_jobs, skills:r.skills||[], skills_suggested:r.skills_suggested||[], preview:'', resume_name:r.label });
 }
 </script>
 </body>

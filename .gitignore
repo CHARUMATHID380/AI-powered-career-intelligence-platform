@@ -1,18 +1,43 @@
-nltk_data/ 
-__pycache__/ 
-.vercel
-.env*
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+.eggs/
 
+# Virtual environments
 venv/
+env/
+.venv/
 fastapi_service/venv/
-__pycache__/
-*.pyc
-.vercel/
-venv/
-__pycache__/
-*.pyc
+
+# Environment variables
 .env
 .env.local
+.env.*
+
+# Vercel
+.vercel/
+
+# NLTK data (bundled separately / downloaded at runtime)
+nltk_data/
+
+# Logs
 *.log
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Node
 node_modules/
+
+# Temp / scratch
+temp-check/
+
+# IDE
+.vscode/
+.idea/
