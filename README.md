@@ -5,7 +5,7 @@ Logistic Regression classifier. Paste resume text or upload a **PDF / DOCX /
 TXT** file, and get back the top matching job categories with confidence
 scores, along with identified skills and role-specific skill suggestions.
 
-**Live demo:**https://ai-powered-career-intelligence-plat-eta.vercel.app/
+**Live demo:**https://web-production-1ca19.up.railway.app/
 
 ---
 
