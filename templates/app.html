@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -788,7 +788,7 @@ select.job-select:focus{border-color:var(--accent);}
   <div style="margin-bottom:28px;max-width:640px;">
     <p class="eyebrow mono">Upskilling library</p>
     <h1 style="font-family:'Source Serif 4',serif;font-size:28px;font-weight:600;margin:0 0 8px;">Find courses to close your skill gap</h1>
-    <p style="color:var(--muted);font-size:14px;margin:0;">Choose a career path and CareerCast surfaces YouTube tutorials for every skill — filtered by core requirements or recommended competencies.</p>
+    <p style="color:var(--muted);font-size:14px;margin:0;">Choose a career path and CareerCast surfaces curated courses from Udemy, Coursera, and global certifications for every skill — filtered by core requirements or recommended competencies.</p>
   </div>
 
   <div class="controls-bar">
@@ -823,11 +823,11 @@ select.job-select:focus{border-color:var(--accent);}
         <h2 style="font-family:'Source Serif 4',serif;font-size:20px;font-weight:600;margin:0;" id="c-heading">Select a career path</h2>
         <span style="font-size:12px;color:var(--muted-2);font-family:'IBM Plex Mono',monospace;" id="c-count"></span>
       </div>
-      <div id="c-results"><div class="state-box"><p>Choose a career path above and click <strong>Load courses</strong> to see curated YouTube tutorials.</p></div></div>
+      <div id="c-results"><div class="state-box"><p>Choose a career path above and click <strong>Load courses</strong> to see curated Udemy, Coursera and certification recommendations.</p></div></div>
     </div>
   </div>
 </div>
-<div class="wrap" style="padding-top:0;padding-bottom:0;"><footer class="site-footer"><span>Course results are sourced from YouTube. CareerCast does not endorse any content creator.</span></footer></div>
+<div class="wrap" style="padding-top:0;padding-bottom:0;"><footer class="site-footer"><span>Course links open on Udemy, Coursera, and certification bodies. CareerCast does not affiliate with any platform.</span></footer></div>
 </div><!-- /page-courses -->
 
 <!-- =====================================================================
@@ -1037,7 +1037,7 @@ function toolRenderGap(job,data){
   const rems=(sugg.remove||[]).map(x=>`<li>${esc(x)}</li>`).join('');
   const cg=courses.map(g=>{
     const rs=g.results||[];
-    let items=!rs.length?`<span class="course-card unavailable">No courses found.</span>`:rs[0]?.error?`<span class="course-card unavailable">${esc(rs[0].error)}</span>`:rs.map(c=>`<a class="course-card" href="${esc(c.url||'#')}" target="_blank" rel="noopener">${esc(c.title||'Untitled')}<span class="course-channel">${esc(c.channel||'')}</span></a>`).join('');
+    let items=!rs.length?`<span class="course-card unavailable">No courses found.</span>`:rs[0]?.error?`<span class="course-card unavailable">${esc(rs[0].error)}</span>`:rs.map(c=>`<a class="course-card" href="${esc(c.url||'#')}" target="_blank" rel="noopener">${esc(c.title||'Untitled')}<span class="course-channel">${esc(c.platform||c.provider||c.channel||'')}</span></a>`).join('');
     return `<div class="course-group"><span class="skill-label mono">${esc(g.skill)}</span>${items}</div>`;
   }).join('');
   panel.innerHTML=`<p class="gap-panel-title mono">Skill gap report</p><p class="gap-panel-job">${esc(job)}</p>${note}<div class="skill-cluster"><h4>Core skills</h4><div class="pill-row">${pc}${mc||'<span style="color:var(--muted-2);font-size:13px;">All core skills present.</span>'}</div></div>${(pr||mr)?`<div class="skill-cluster"><h4>Recommended skills</h4><div class="pill-row">${pr}${mr}</div></div>`:''}${adds?`<div class="skill-cluster"><h4>Suggested additions</h4><ul class="suggestion-list add">${adds}</ul></div>`:''}${rems?`<div class="skill-cluster"><h4>Suggested removals</h4><ul class="suggestion-list remove">${rems}</ul></div>`:''}${cg?`<div class="skill-cluster"><h4>Recommended courses</h4>${cg}</div>`:''}`;
@@ -1134,7 +1134,7 @@ function dashRenderCourses(courses,job){
   document.getElementById('d-courseTitle').textContent=`Courses to close your gap for ${job}`;
   const el=document.getElementById('d-courses');
   if(!courses.length){el.innerHTML='<p style="color:var(--muted-2);font-size:13px;">No course data available.</p>';return;}
-  el.innerHTML=courses.map(g=>{const rs=g.results||[];let items=!rs.length?'<span style="color:var(--muted-2);font-size:13px;">No results.</span>':rs[0]?.error?`<span style="color:var(--muted-2);font-size:13px;">${esc(rs[0].error)}</span>`:rs.slice(0,3).map(c=>`<a class="course-card-flex" href="${esc(c.url||'#')}" target="_blank" rel="noopener"><div class="course-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div><div style="font-weight:500;font-size:13px;">${esc(c.title||'Untitled')}</div><div style="font-size:11.5px;color:var(--muted-2);font-family:'IBM Plex Mono',monospace;">${esc(c.channel||'')} · YouTube</div></div></a>`).join('');return `<div class="course-group"><span class="skill-label mono">${esc(g.skill)}</span>${items}</div>`;}).join('');
+  el.innerHTML=courses.map(g=>{const rs=g.results||[];let items=!rs.length?'<span style="color:var(--muted-2);font-size:13px;">No results.</span>':rs[0]?.error?`<span style="color:var(--muted-2);font-size:13px;">${esc(rs[0].error)}</span>`:rs.slice(0,3).map(c=>`<a class="course-card-flex" href="${esc(c.url||'#')}" target="_blank" rel="noopener"><div class="course-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><div><div style="font-weight:500;font-size:13px;">${esc(c.title||'Untitled')}</div><div style="font-size:11.5px;color:var(--muted-2);font-family:'IBM Plex Mono',monospace;">${esc(c.platform||c.provider||c.channel||'')}</div></div></a>`).join('');return `<div class="course-group"><span class="skill-label mono">${esc(g.skill)}</span>${items}</div>`;}).join('');
 }
 function dashExportJSON(){if(!dashLastResults)return;const b=new Blob([JSON.stringify({timestamp:new Date().toISOString(),top_matches:dashLastResults,gap_report:dashLastGap||null},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='careercast-report.json';a.click();}
 </script>
@@ -1402,7 +1402,7 @@ function coursesRender(courses){
   document.getElementById('c-results').innerHTML=filtered.map((group,gi)=>{
     const isCore=coreSet.has(group.skill.toLowerCase());
     const rs=group.results||[];
-    let cards=!rs.length?`<p class="no-results">No results for this skill.</p>`:rs[0]?.error?`<p class="no-results">${esc(rs[0].error)}</p>`:`<div class="course-cards-grid">`+rs.slice(0,4).map((c,ci)=>`<a class="ccard" href="${esc(c.url||'#')}" target="_blank" rel="noopener"><div class="ccard-thumb" style="background:${TC[(gi+ci)%TC.length]};"><span class="thumb-skill">${esc(group.skill)}</span><div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div><div class="ccard-body"><div class="ccard-title">${esc(c.title||'Untitled')}</div><div class="ccard-meta">${esc(c.channel||'Unknown channel')} · YouTube</div><span class="ccard-tag">▶ Watch free</span></div></a>`).join('')+`</div>`;
+    let cards=!rs.length?`<p class="no-results">No results for this skill.</p>`:rs[0]?.error?`<p class="no-results">${esc(rs[0].error)}</p>`:`<div class="course-cards-grid">`+rs.slice(0,4).map((c,ci)=>`<a class="ccard" href="${esc(c.url||'#')}" target="_blank" rel="noopener"><div class="ccard-thumb" style="background:${TC[(gi+ci)%TC.length]};"><span class="thumb-skill">${esc(group.skill)}</span><div class="play-btn"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div></div><div class="ccard-body"><div class="ccard-title">${esc(c.title||'Untitled')}</div><div class="ccard-meta">${esc(c.platform||c.provider||c.channel||'Course')}</div><span class="ccard-tag">${(c.platform||"").toLowerCase().includes("cert") ? "🏆 Certification" : (c.platform||"").toLowerCase().includes("coursera") ? "🎓 Coursera" : (c.platform||"").toLowerCase().includes("udemy") ? "🎓 Udemy" : "🎓 Open course"}</span></div></a>`).join('')+`</div>`;
     return `<div class="course-section"><div class="course-section-head"><span class="skill-name">${esc(group.skill)}</span><span class="badge ${isCore?'core':'rec'}">${isCore?'core skill':'recommended'}</span></div>${cards}</div>`;
   }).join('');
 }

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -564,7 +564,7 @@ function renderCourses(courses, job){
         <div class="mc-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
         <div class="mc-body">
           <div class="mc-title">${esc(c.title||'Untitled')}</div>
-          <div class="mc-meta">${esc(c.channel||'')} · YouTube</div>
+          <div class="mc-meta">${esc(c.platform||c.provider||c.channel||"")}</div>
         </div>
         <span class="mc-skill-tag">${esc(group.skill)}</span>
       </a>`).join('');
